@@ -52,6 +52,13 @@ function DrawingDriver(ctx, w, h){
             end: len
         });
     }
+    this.hitTest = function(note, x, y){
+        return (
+            note.start <= this.getX(x) &&
+            note.start + note.end >= this.getX(x) &&
+            this.getY(y) === note.note
+        )
+    }
 }
 
 function PianoRoll(options){
@@ -73,9 +80,30 @@ function PianoRoll(options){
         self.hoverNote = self.drv.createNote(1, e.offsetX, e.offsetY, 1)
         self.draw();
     });
+    
+    this._hitTest = function(note){
+        var matched = -1;
+        for(var i = 0; i < self.notes.length; i++){
+            var n = self.notes[i];
+            if(
+                n.note === note.note &&
+                n.start <= note.start &&
+                n.start + n.end >= note.start
+            ){
+                matched = i;
+            }
+        }
+        return matched;
+    }
+    
     this.el.addEventListener("click", function(e){
         var note = self.drv.createNote(1, e.offsetX, e.offsetY, 1);
-        self.notes.push(note);
+        var matched = self._hitTest(note);
+        if(matched >= 0){
+            self.notes.splice(matched, 1);
+        }else{
+            self.notes.push(note);
+        }
     });
 }
 
