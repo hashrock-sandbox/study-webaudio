@@ -88,7 +88,7 @@ function PianoRoll(options){
             if(
                 n.note === note.note &&
                 n.start <= note.start &&
-                n.start + n.end >= note.start
+                n.start + n.end - 1 >= note.start
             ){
                 matched = i;
             }
