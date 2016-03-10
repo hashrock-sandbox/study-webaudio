@@ -6,61 +6,72 @@ function Note(options){
     
 }
 
+function NoteScale(xScale, yScale){
+    return function(x, y, w, h){
+        return {
+            x: x * xScale,
+            y: y * yScale,
+            w: xScale,
+            h: yScale
+        }
+    }
+}
+
+
 function PianoRoll(options){
+    var self = this;
     this.el = options.el;
     this.w = this.el.offsetWidth;
     this.h = this.el.offsetHeight;
     this.ctx = this.el.getContext("2d");
-    this.notes = [
-        new Note({
-            ch: 1,
-            note: 3,
-            start: 2,
-            end: 1
-        }),
-        new Note({
-            ch: 1,
-            note: 4,
-            start: 3,
-            end: 3
-        })
-    ];
+    this.notes = options.notes ? options.notes : [];
+    this.noteWidth = this.w / 32;
+    this.noteHeight = this.h / 48;
+    this.scale = NoteScale(this.noteWidth, this.noteHeight);
+    this.hoverNote = null;
     
-    this._drawRect = function(x, y, w, h){
-        this.ctx.fillStyle = "#FFF";
+    this._drawRect = function(x, y, w, h, color){
+        this.ctx.fillStyle = color;
         this.ctx.fillRect(x, y, w, h);
     }
     
-    this.drawNote = function(note){
-        var noteHeight = this.h / 48;
-        var noteWidth = this.w / 32;
-        this.fillRect(
-            noteWidth * note.start,
-            this.h - noteHeight * note.note,
-            noteWidth * note.end,
-            noteHeight
-        );
+    this.drawNote = function(note, color){
+        var t = this.scale(note.start, note.note, note.end, 1);
+        this._drawRect(t.x, this.h - t.y - t.h, t.w, t.h, color);
      }
-    var self = this;
+     
     this.clear = function(){
         this.ctx.clearRect(0, 0, this.w, this.h);
     }
     
-    this.ready = function(){
+    this.draw = function(){
         this.clear();
         this.notes.forEach(function(note){
-            self.drawNote(note)
+            self.drawNote(note, "#FFF")
         })
+        
+        if(this.hoverNote){
+            self.drawNote(this.hoverNote, "rgba(255,255,255,0.5)");
+        }
     }
     this.el.addEventListener("mousemove", function(e){
-        self.mx = e.offsetX;
-        self.my = e.offsetY;
+        self.hoverNote = new Note({
+            ch: 1,
+            note: Math.floor((self.h - e.offsetY ) / self.noteHeight),
+            start: Math.floor(e.offsetX / self.noteWidth),
+            end: 1
+        })
+        self.draw();
     });
-
+    
     this.el.addEventListener("click", function(e){
-        self.mx = e.offsetX;
-        self.my = e.offsetY;
-        console.log("c");
+        var note = new Note({
+            ch: 1,
+            note: Math.floor((self.h - e.offsetY ) / self.noteHeight),
+            start: Math.floor(e.offsetX / self.noteWidth),
+            end: 1
+        })
+        self.notes.push(note);
     });
 }
 
@@ -69,4 +80,4 @@ var piano = new PianoRoll({
     el : el
 });
 
-piano.ready();
+piano.draw();
