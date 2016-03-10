@@ -1,0 +1,23 @@
+{
+  "name": "portarool",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "parallelshell 'npm run watch:js'",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch:js": "watchify main.js -o bundle.js -dv"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "browserify": "^13.0.0",
+    "parallelshell": "^2.0.0",
+    "watchify": "^3.7.0"
+  },
+  "dependencies": {
+    "d3": "^3.5.16",
+    "jquery": "^2.2.1",
+    "two.js": "^0.5.0"
+  }
+}
