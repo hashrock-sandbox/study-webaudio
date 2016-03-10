@@ -27,7 +27,7 @@ function playNote(e) {
     var amp = audioContext.createGain();
     osc1.frequency.value = mtof(e.noteNumber);
     osc1.connect(amp);
-    amp.gain.value = 0.05;
+    amp.gain.value = 0.1;
     osc1.start();
     amp.connect(audioContext.destination);
     setTimeout(function () {
@@ -113,6 +113,12 @@ function PianoRoll(options) {
         }
         return matched;
     }
+    this.el.addEventListener("mousedown", function (e) {
+        var note = self.drv.createNote(1, e.offsetX, e.offsetY, 1);
+        playNote({
+            noteNumber: note.note + 48
+        });
+    });
 
     this.el.addEventListener("click", function (e) {
         var note = self.drv.createNote(1, e.offsetX, e.offsetY, 1);
@@ -120,9 +126,6 @@ function PianoRoll(options) {
         if (matched >= 0) {
             self.notes.splice(matched, 1);
         } else {
-            playNote({
-                noteNumber: note.note + 48
-            });
             self.notes.push(note);
         }
     });
