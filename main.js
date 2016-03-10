@@ -17,19 +17,13 @@ function NoteScale(xScale, yScale){
     }
 }
 
-
-function PianoRoll(options){
-    var self = this;
-    this.el = options.el;
-    this.w = this.el.offsetWidth;
-    this.h = this.el.offsetHeight;
-    this.ctx = this.el.getContext("2d");
-    this.notes = options.notes ? options.notes : [];
+function DrawingDriver(ctx, w, h){
+    this.w = w;
+    this.h = h;
     this.noteWidth = this.w / 32;
     this.noteHeight = this.h / 48;
+    this.ctx = ctx;
     this.scale = NoteScale(this.noteWidth, this.noteHeight);
-    this.hoverNote = null;
-    
     this._drawRect = function(x, y, w, h, color){
         this.ctx.fillStyle = color;
         this.ctx.fillRect(x, y, w, h);
@@ -38,39 +32,49 @@ function PianoRoll(options){
     this.drawNote = function(note, color){
         var t = this.scale(note.start, note.note, note.end, 1);
         this._drawRect(t.x, this.h - t.y - t.h, t.w, t.h, color);
-     }
-     
+    }
+    this.getY = function(y){
+        return Math.floor((this.h - y ) / this.noteHeight)
+    }
+    this.getX = function(x){
+        return Math.floor(x / this.noteWidth)
+    }
+
     this.clear = function(){
         this.ctx.clearRect(0, 0, this.w, this.h);
     }
     
+    this.createNote = function(ch, x, y, len){
+        return new Note({
+            ch: ch,
+            start: this.getX(x),
+            note: this.getY(y),
+            end: len
+        });
+    }
+}
+
+function PianoRoll(options){
+    var self = this;
+    this.el = options.el;
+    this.notes = options.notes ? options.notes : [];
+    this.drv = new DrawingDriver(this.el.getContext("2d"), this.el.offsetWidth, this.el.offsetHeight);
+    this.hoverNote = null;
     this.draw = function(){
-        this.clear();
+        this.drv.clear();
         this.notes.forEach(function(note){
-            self.drawNote(note, "#FFF")
+            self.drv.drawNote(note, "#FFF")
         })
-        
         if(this.hoverNote){
-            self.drawNote(this.hoverNote, "rgba(255,255,255,0.5)");
+            self.drv.drawNote(this.hoverNote, "rgba(255,255,255,0.5)");
         }
     }
     this.el.addEventListener("mousemove", function(e){
-        self.hoverNote = new Note({
-            ch: 1,
-            note: Math.floor((self.h - e.offsetY ) / self.noteHeight),
-            start: Math.floor(e.offsetX / self.noteWidth),
-            end: 1
-        })
+        self.hoverNote = self.drv.createNote(1, e.offsetX, e.offsetY, 1)
         self.draw();
     });
-    
     this.el.addEventListener("click", function(e){
-        var note = new Note({
-            ch: 1,
-            note: Math.floor((self.h - e.offsetY ) / self.noteHeight),
-            start: Math.floor(e.offsetX / self.noteWidth),
-            end: 1
-        })
+        var note = self.drv.createNote(1, e.offsetX, e.offsetY, 1);
         self.notes.push(note);
     });
 }
