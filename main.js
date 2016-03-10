@@ -25,24 +25,21 @@ function PianoRoll(options){
             end: 3
         })
     ];
-    this.drawNote = function(note){
+    
+    this._drawRect = function(x, y, w, h){
         this.ctx.fillStyle = "#FFF";
+        this.ctx.fillRect(x, y, w, h);
+    }
+    
+    this.drawNote = function(note){
         var noteHeight = this.h / 48;
         var noteWidth = this.w / 32;
-        this.ctx.fillStyle = "#FFF";
-        this.ctx.fillRect(
+        this.fillRect(
             noteWidth * note.start,
             this.h - noteHeight * note.note,
             noteWidth * note.end,
             noteHeight
         );
-        console.log(
-            noteWidth * note.start,
-            this.h - noteHeight * note.note,
-            noteWidth * note.end,
-            noteHeight
-            
-        )
      }
     var self = this;
     this.clear = function(){
