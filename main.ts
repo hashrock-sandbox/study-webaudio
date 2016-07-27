@@ -19,7 +19,14 @@ class Note{
     }
 }
 
-function NoteScale(xScale:number, yScale:number) {
+interface NoteScaleData{
+    x:number,
+    y:number,
+    w:number,
+    h:number
+}
+
+function NoteScale(xScale:number, yScale:number): (x:number, y:number, w:number, h:number)=>NoteScaleData {
     return function (x:number, y:number, w:number, h:number) {
         return {
             x: x * xScale,
@@ -58,7 +65,7 @@ class DrawingDriver{
     noteWidth : number;
     noteHeight : number;
     ctx : CanvasRenderingContext2D;
-    scale : any;
+    scale : (x:number, y:number, w:number, h:number)=>NoteScaleData;
 
     constructor(ctx:CanvasRenderingContext2D, w:number, h:number){
         this.w = w;
