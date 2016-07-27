@@ -1,13 +1,26 @@
-function Note(options) {
-    this.ch = options.ch ? options.ch : 1;
-    this.note = options.note ? options.note : 0;
-    this.start = options.start ? options.start : 0;
-    this.end = options.end ? options.end : 1;
-
+interface NoteOptions{
+    ch: number,
+    start: number,
+    note: number,
+    end: number
 }
 
-function NoteScale(xScale, yScale) {
-    return function (x, y, w, h) {
+class Note{
+    ch: number;
+    start: number;
+    note: number;
+    end: number;
+    constructor(options: NoteOptions){
+        this.ch = options.ch ? options.ch : 1;
+        this.note = options.note ? options.note : 0;
+        this.start = options.start ? options.start : 0;
+        this.end = options.end ? options.end : 1;
+
+    }
+}
+
+function NoteScale(xScale:number, yScale:number) {
+    return function (x:number, y:number, w:number, h:number) {
         return {
             x: x * xScale,
             y: y * yScale,
@@ -18,10 +31,15 @@ function NoteScale(xScale, yScale) {
 }
 
 var audioContext = new AudioContext();
-function mtof(noteNumber) {
+function mtof(noteNumber:number) {
     return 440 * Math.pow(2, (noteNumber - 69) / 12);
 }
-function playNote(e) {
+
+interface NoteEvent{
+    noteNumber:number;
+}
+
+function playNote(e:NoteEvent) {
     var osc1 = audioContext.createOscillator();
     var amp = audioContext.createGain();
     osc1.frequency.value = mtof(e.noteNumber);
@@ -34,34 +52,43 @@ function playNote(e) {
     }, 100);
 }
 
-function DrawingDriver(ctx, w, h) {
-    this.w = w;
-    this.h = h;
-    this.noteWidth = this.w / 32;
-    this.noteHeight = this.h / 48;
-    this.ctx = ctx;
-    this.scale = NoteScale(this.noteWidth, this.noteHeight);
-    this._drawRect = function (x, y, w, h, color) {
+class DrawingDriver{
+    w : number;
+    h : number;
+    noteWidth : number;
+    noteHeight : number;
+    ctx : CanvasRenderingContext2D;
+    scale : any;
+
+    constructor(ctx:CanvasRenderingContext2D, w:number, h:number){
+        this.w = w;
+        this.h = h;
+        this.noteWidth = this.w / 32;
+        this.noteHeight = this.h / 48;
+        this.ctx = ctx;
+        this.scale = NoteScale(this.noteWidth, this.noteHeight);
+    }
+    _drawRect(x:number, y:number, w:number, h:number, color:string) {
         this.ctx.fillStyle = color;
         this.ctx.fillRect(x, y, w, h);
     }
 
-    this.drawNote = function (note, color) {
+    drawNote(note:Note, color:string) {
         var t = this.scale(note.start, note.note, note.end, 1);
         this._drawRect(t.x, this.h - t.y - t.h, t.w, t.h, color);
     }
-    this.getY = function (y) {
+    getY(y:number) {
         return Math.floor((this.h - y) / this.noteHeight)
     }
-    this.getX = function (x) {
+    getX(x:number) {
         return Math.floor(x / this.noteWidth)
     }
 
-    this.clear = function () {
+    clear() {
         this.ctx.clearRect(0, 0, this.w, this.h);
     }
 
-    this.createNote = function (ch, x, y, len) {
+    createNote(ch:number, x:number, y:number, len:number) {
         return new Note({
             ch: ch,
             start: this.getX(x),
@@ -69,7 +96,7 @@ function DrawingDriver(ctx, w, h) {
             end: len
         });
     }
-    this.hitTest = function (note, x, y) {
+    hitTest(note:Note, x:number, y:number) {
         return (
             note.start <= this.getX(x) &&
             note.start + note.end >= this.getX(x) &&
@@ -78,30 +105,58 @@ function DrawingDriver(ctx, w, h) {
     }
 }
 
-function PianoRoll(options) {
-    var self = this;
-    this.el = options.el;
-    this.notes = options.notes ? options.notes : [];
-    this.drv = new DrawingDriver(this.el.getContext("2d"), this.el.offsetWidth, this.el.offsetHeight);
-    this.hoverNote = null;
-    this.draw = function () {
+
+interface PianoRollOptions{
+    el: HTMLCanvasElement,
+    notes: Note[]
+}
+
+class PianoRoll{
+    el: HTMLCanvasElement;
+    notes: Note[];
+    drv: DrawingDriver;
+    hoverNote: Note | null;
+
+    constructor(options:PianoRollOptions){
+        this.el = options.el;
+        this.notes = options.notes ? options.notes : [];
+        this.drv = new DrawingDriver(this.el.getContext("2d"), this.el.offsetWidth, this.el.offsetHeight);
+        this.hoverNote = null;
+        this.el.addEventListener("mousemove", (e:MouseEvent)=> {
+            this.hoverNote = this.drv.createNote(1, e.offsetX, e.offsetY, 1)
+            this.draw();
+        });        
+        this.el.addEventListener("mousedown", (e:MouseEvent)=> {
+            var note = this.drv.createNote(1, e.offsetX, e.offsetY, 1);
+            playNote({
+                noteNumber: note.note + 48
+            });
+        });
+        this.el.addEventListener("click", (e:MouseEvent)=> {
+            var note = this.drv.createNote(1, e.offsetX, e.offsetY, 1);
+            var matched = this._hitTest(note);
+            if (matched >= 0) {
+                this.notes.splice(matched, 1);
+            } else {
+                this.notes.push(note);
+            }
+        });
+    }
+    draw() {
         this.drv.clear();
-        this.notes.forEach(function (note) {
-            self.drv.drawNote(note, "#FFF")
+        this.notes.forEach( (note: Note)=> {
+            this.drv.drawNote(note, "#FFF")
         })
         if (this.hoverNote) {
-            self.drv.drawNote(this.hoverNote, "rgba(255,255,255,0.5)");
+            this.drv.drawNote(this.hoverNote, "rgba(255,255,255,0.5)");
         }
     }
-    this.el.addEventListener("mousemove", function (e) {
-        self.hoverNote = self.drv.createNote(1, e.offsetX, e.offsetY, 1)
-        self.draw();
-    });
 
-    this._hitTest = function (note) {
+
+    _hitTest(note: Note) {
         var matched = -1;
-        for (var i = 0; i < self.notes.length; i++) {
-            var n = self.notes[i];
+        for (var i = 0; i < this.notes.length; i++) {
+            var n = this.notes[i];
             if (
                 n.note === note.note &&
                 n.start <= note.start &&
@@ -112,27 +167,12 @@ function PianoRoll(options) {
         }
         return matched;
     }
-    this.el.addEventListener("mousedown", function (e) {
-        var note = self.drv.createNote(1, e.offsetX, e.offsetY, 1);
-        playNote({
-            noteNumber: note.note + 48
-        });
-    });
-
-    this.el.addEventListener("click", function (e) {
-        var note = self.drv.createNote(1, e.offsetX, e.offsetY, 1);
-        var matched = self._hitTest(note);
-        if (matched >= 0) {
-            self.notes.splice(matched, 1);
-        } else {
-            self.notes.push(note);
-        }
-    });
 }
 
-var el = document.querySelector(".canvas");
-var piano = new PianoRoll({
-    el: el
+var el:HTMLCanvasElement = <HTMLCanvasElement> document.querySelector(".canvas");
+var piano:PianoRoll = new PianoRoll({
+    el: el,
+    notes: []
 });
 
 piano.draw();
