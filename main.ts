@@ -17,7 +17,6 @@ function NoteScale(xScale, yScale) {
     }
 }
 
-window.AudioContext = window.AudioContext || window.webkitAudioContext;
 var audioContext = new AudioContext();
 function mtof(noteNumber) {
     return 440 * Math.pow(2, (noteNumber - 69) / 12);
