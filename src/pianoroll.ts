@@ -1,26 +1,14 @@
 import {DrawingDriver} from "./canvas"
 import {Note} from "./note"
-import * as util from "./util"
-
-var audioContext = new AudioContext();
+import * as audio from "./audio"
 
 interface NoteEvent {
   noteNumber: number;
 }
 
 function playNote(e: NoteEvent) {
-  var osc1 = audioContext.createOscillator();
-  var amp = audioContext.createGain();
-  osc1.frequency.value = util.mtof(e.noteNumber);
-  osc1.connect(amp);
-  amp.gain.value = 0.1;
-  osc1.start();
-  amp.connect(audioContext.destination);
-  setTimeout(function () {
-    osc1.disconnect();
-  }, 100);
+  audio.playNote(e.noteNumber, 100)
 }
-
 
 interface PianoRollOptions {
   el: HTMLCanvasElement,
@@ -71,7 +59,6 @@ export class PianoRoll {
     })
 
     this.el.addEventListener("mouseup", (e: MouseEvent) => {
-      //var note = this.drv.createNote(1, e.offsetX, e.offsetY, 1);
       var note = this.drv.createNoteWithLength(1, this.startPos, e.offsetY, e.offsetX);
       var matched = this._hitTest(note);
       if (matched >= 0) {
