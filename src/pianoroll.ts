@@ -34,7 +34,7 @@ export class PianoRoll {
     this.clicked = false;
     this.nowNote = -1;
     this.playing = false;
-    this.playingPos = 0;
+    this.playingPos = -1;
 
     let bpm = 120
     let timebase = 60000 / bpm / 4;

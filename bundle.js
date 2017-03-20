@@ -96,7 +96,7 @@
 	        this.clicked = false;
 	        this.nowNote = -1;
 	        this.playing = false;
-	        this.playingPos = 0;
+	        this.playingPos = -1;
 	        var bpm = 120;
 	        var timebase = 60000 / bpm / 4;
 	        setInterval(function () {
