@@ -9,13 +9,24 @@ var piano: PianoRoll = new PianoRoll({
 let playing = false;
 
 var playButton = document.querySelector("#play")
-playButton.addEventListener("click", ()=>{
+
+function togglePlaying(){
   if(playing){
     piano.stop();
     playing = false
   }else{
     piano.play()
     playing = true
+  }
+}
+
+playButton.addEventListener("click", ()=>{
+  togglePlaying()
+})
+
+document.addEventListener("keypress", (e)=>{
+  if(e.keyCode === 32){
+    togglePlaying()
   }
 })
 
