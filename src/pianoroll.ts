@@ -42,6 +42,7 @@ export class PianoRoll {
     setInterval(() => {
       if (this.playing) {
         this.playingPos++;
+        this.drv.playPosition = this.playingPos
         if (this.playingPos > 32) {
           this.playingPos = 0;
         }
@@ -52,6 +53,7 @@ export class PianoRoll {
             }, note.length * 60000 / bpm / 4)
           }
         })
+        this.draw()
       }
     }, timebase)
 
@@ -77,6 +79,7 @@ export class PianoRoll {
       playNote({
         noteNumber: note.no + 48
       }, 100);
+      this.draw();
       this.clicked = true
     })
 
@@ -88,6 +91,7 @@ export class PianoRoll {
       } else {
         this.notes.push(note);
       }
+      this.draw();
       this.clicked = false
     });
   }
