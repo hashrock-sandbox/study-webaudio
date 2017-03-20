@@ -8,13 +8,13 @@ interface NoteOptions {
 class Note {
   ch: number;
   start: number;
-  note: number;
-  end: number;
+  no: number;
+  length: number;
   constructor(options: NoteOptions) {
     this.ch = options.ch ? options.ch : 1;
-    this.note = options.note ? options.note : 0;
+    this.no = options.note ? options.note : 0;
     this.start = options.start ? options.start : 0;
-    this.end = options.end ? options.end : 1;
+    this.length = options.end ? options.end : 1;
 
   }
 }
@@ -81,7 +81,7 @@ class DrawingDriver {
   }
 
   drawNote(note: Note, color: string) {
-    var t = this.scale(note.start, note.note, note.end, 1);
+    var t = this.scale(note.start, note.no, note.length, 1);
     this._drawRect(t.x, this.h - t.y - t.h, t.w, t.h, color);
   }
   getY(y: number) {
@@ -114,8 +114,8 @@ class DrawingDriver {
   hitTest(note: Note, x: number, y: number) {
     return (
       note.start <= this.getX(x) &&
-      note.start + note.end >= this.getX(x) &&
-      this.getY(y) === note.note
+      note.start + note.length >= this.getX(x) &&
+      this.getY(y) === note.no
     )
   }
 }
@@ -148,11 +148,11 @@ class PianoRoll {
       var note = this.drv.createNote(1, e.offsetX, e.offsetY, 1);
       if (this.clicked) {
         note = this.drv.createNoteWithLength(1, this.startPos, e.offsetY, e.offsetX);
-        if (this.nowNote !== note.note) {
+        if (this.nowNote !== note.no) {
           playNote({
-            noteNumber: note.note + 48
+            noteNumber: note.no + 48
           });
-          this.nowNote = note.note
+          this.nowNote = note.no
         }
       }
       this.hoverNote = note
@@ -161,10 +161,10 @@ class PianoRoll {
 
     this.el.addEventListener("mousedown", (e) => {
       var note = this.drv.createNote(1, e.offsetX, e.offsetY, 1);
-      this.nowNote = note.note
+      this.nowNote = note.no
       this.startPos = note.start
       playNote({
-        noteNumber: note.note + 48
+        noteNumber: note.no + 48
       });
       this.clicked = true
     })
@@ -197,9 +197,9 @@ class PianoRoll {
     for (var i = 0; i < this.notes.length; i++) {
       var n = this.notes[i];
       if (
-        n.note === note.note &&
+        n.no === note.no &&
         n.start <= note.start &&
-        n.start + n.end - 1 >= note.start
+        n.start + n.length - 1 >= note.start
       ) {
         matched = i;
       }
