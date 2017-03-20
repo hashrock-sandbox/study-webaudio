@@ -1,13 +1,13 @@
-import {DrawingDriver} from "./canvas"
-import {Note} from "./note"
+import { DrawingDriver } from "./canvas"
+import { Note } from "./note"
 import * as audio from "./audio"
 
 interface NoteEvent {
   noteNumber: number;
 }
 
-function playNote(e: NoteEvent) {
-  audio.playNote(e.noteNumber, 100)
+function playNote(e: NoteEvent, length: number) {
+  audio.playNote(e.noteNumber, length)
 }
 
 interface PianoRollOptions {
@@ -23,6 +23,8 @@ export class PianoRoll {
   clicked: boolean;
   nowNote: number;
   startPos: number;
+  playing: boolean;
+  playingPos: number;
 
   constructor(options: PianoRollOptions) {
     this.el = options.el;
@@ -31,7 +33,27 @@ export class PianoRoll {
     this.hoverNote = null;
     this.clicked = false;
     this.nowNote = -1;
+    this.playing = false;
+    this.playingPos = 0;
 
+    let bpm = 120
+    let timebase = 60000 / bpm / 4;
+
+    setInterval(() => {
+      if (this.playing) {
+        this.playingPos++;
+        if (this.playingPos > 32) {
+          this.playingPos = 0;
+        }
+        this.notes.forEach((note) => {
+          if (note.start === this.playingPos) {
+            playNote({
+              noteNumber: note.no + 48
+            }, note.length * 60000 / bpm / 4)
+          }
+        })
+      }
+    }, timebase)
 
     this.el.addEventListener("mousemove", (e: MouseEvent) => {
       var note = this.drv.createNote(1, e.offsetX, e.offsetY, 1);
@@ -40,7 +62,7 @@ export class PianoRoll {
         if (this.nowNote !== note.no) {
           playNote({
             noteNumber: note.no + 48
-          });
+          }, 100);
           this.nowNote = note.no
         }
       }
@@ -54,7 +76,7 @@ export class PianoRoll {
       this.startPos = note.start
       playNote({
         noteNumber: note.no + 48
-      });
+      }, 100);
       this.clicked = true
     })
 
@@ -69,13 +91,22 @@ export class PianoRoll {
       this.clicked = false
     });
   }
-  draw() {
-    this.drv.clear();
+
+  _drawAllNotes() {
     this.notes.forEach((note: Note) => {
       this.drv.drawNote(note, "#FFF")
     })
+  }
+
+  _drawHoverNote() {
+    this.drv.drawNote(this.hoverNote, "rgba(255,255,255,0.5)");
+  }
+
+  draw() {
+    this.drv.clear();
+    this._drawAllNotes()
     if (this.hoverNote) {
-      this.drv.drawNote(this.hoverNote, "rgba(255,255,255,0.5)");
+      this._drawHoverNote()
     }
   }
 
@@ -83,14 +114,25 @@ export class PianoRoll {
     var matched = -1;
     for (var i = 0; i < this.notes.length; i++) {
       var n = this.notes[i];
-      if (
-        n.no === note.no &&
-        n.start <= note.start &&
-        n.start + n.length - 1 >= note.start
-      ) {
+      if (_isHit(n, note)) {
         matched = i;
       }
     }
     return matched;
   }
+
+  play() {
+    this.playing = true
+  }
+  stop() {
+    this.playing = false
+  }
+}
+
+function _isHit(n: Note, note: Note) {
+  return (
+    n.no === note.no &&
+    n.start <= note.start &&
+    n.start + n.length - 1 >= note.start
+  )
 }

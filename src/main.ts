@@ -6,4 +6,17 @@ var piano: PianoRoll = new PianoRoll({
   notes: []
 });
 
+let playing = false;
+
+var playButton = document.querySelector("#play")
+playButton.addEventListener("click", ()=>{
+  if(playing){
+    piano.stop();
+    playing = false
+  }else{
+    piano.play()
+    playing = true
+  }
+})
+
 piano.draw();
