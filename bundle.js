@@ -454,10 +454,11 @@
 	    return "o" + oct + cde + lengthArray.join("^");
 	}
 	exports.noteToNote = noteToNote;
+	var mmlTemplate = "l16v10";
 	function jsonToMML(notes) {
 	    var remainNotes = notes.slice();
 	    var mmls = [];
-	    var mml = "l16";
+	    var mml = mmlTemplate;
 	    //変換戦略：
 	    //1ステップずつノートがあるか見ていき、マッチしたノートをMMLに詰めて配列から削除し、発音長だけ飛ばす。
 	    //48ステップの走査終了後、まだノートが残っているようならもう一度走査。
@@ -487,11 +488,10 @@
 	                i += 1;
 	            }
 	        }
-	        console.log(remainNotes);
 	        //まだNoteが残っているようなら、また最初から
 	        i = 0;
 	        mmls.push(mml);
-	        mml = "";
+	        mml = mmlTemplate;
 	    }
 	    return mmls;
 	}
