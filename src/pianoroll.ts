@@ -114,14 +114,11 @@ export class PianoRoll {
   }
 
   onMouseUp(x: number, y: number) {
-    alert("mo")
     var note = this.drv.createNoteWithLength(1, this.startPos, y, x);
     var matched = this._hitTest(note);
     if (matched >= 0) {
-      alert("hit fail")
       this.notes.splice(matched, 1);
     } else {
-      alert("pushed")
       this.notes.push(note);
     }
     this.draw();

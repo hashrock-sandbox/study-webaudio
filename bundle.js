@@ -117,42 +117,67 @@
 	            }
 	        }, timebase);
 	        this.el.addEventListener("mousemove", function (e) {
-	            var note = _this.drv.createNote(1, e.offsetX, e.offsetY, 1);
-	            if (_this.clicked) {
-	                note = _this.drv.createNoteWithLength(1, _this.startPos, e.offsetY, e.offsetX);
-	                if (_this.nowNote !== note.no) {
-	                    playNote({
-	                        noteNumber: note.no + 48
-	                    }, 100);
-	                    _this.nowNote = note.no;
-	                }
-	            }
-	            _this.hoverNote = note;
-	            _this.draw();
+	            _this.onMouseMove(e.offsetX, e.offsetY);
 	        });
 	        this.el.addEventListener("mousedown", function (e) {
-	            var note = _this.drv.createNote(1, e.offsetX, e.offsetY, 1);
-	            _this.nowNote = note.no;
-	            _this.startPos = note.start;
-	            playNote({
-	                noteNumber: note.no + 48
-	            }, 100);
-	            _this.draw();
-	            _this.clicked = true;
+	            e.preventDefault();
+	            _this.onMouseDown(e.offsetX, e.offsetY);
 	        });
 	        this.el.addEventListener("mouseup", function (e) {
-	            var note = _this.drv.createNoteWithLength(1, _this.startPos, e.offsetY, e.offsetX);
-	            var matched = _this._hitTest(note);
-	            if (matched >= 0) {
-	                _this.notes.splice(matched, 1);
-	            }
-	            else {
-	                _this.notes.push(note);
-	            }
-	            _this.draw();
-	            _this.clicked = false;
+	            e.preventDefault();
+	            _this.onMouseUp(e.offsetX, e.offsetY);
+	        });
+	        this.el.addEventListener("touchmove", function (e) {
+	            var pos = convertTouchEvent(e);
+	            _this.onMouseMove(pos.x, pos.y);
+	        });
+	        this.el.addEventListener("touchstart", function (e) {
+	            e.preventDefault();
+	            var pos = convertTouchEvent(e);
+	            _this.onMouseDown(pos.x, pos.y);
+	        });
+	        this.el.addEventListener("touchend", function (e) {
+	            e.preventDefault();
+	            var pos = convertTouchEvent(e);
+	            _this.onMouseUp(pos.x, pos.y);
 	        });
 	    }
+	    PianoRoll.prototype.onMouseDown = function (x, y) {
+	        var note = this.drv.createNote(1, x, y, 1);
+	        this.nowNote = note.no;
+	        this.startPos = note.start;
+	        playNote({
+	            noteNumber: note.no + 48
+	        }, 100);
+	        this.draw();
+	        this.clicked = true;
+	    };
+	    PianoRoll.prototype.onMouseMove = function (x, y) {
+	        var note = this.drv.createNote(1, x, y, 1);
+	        if (this.clicked) {
+	            note = this.drv.createNoteWithLength(1, this.startPos, y, x);
+	            if (this.nowNote !== note.no) {
+	                playNote({
+	                    noteNumber: note.no + 48
+	                }, 100);
+	                this.nowNote = note.no;
+	            }
+	        }
+	        this.hoverNote = note;
+	        this.draw();
+	    };
+	    PianoRoll.prototype.onMouseUp = function (x, y) {
+	        var note = this.drv.createNoteWithLength(1, this.startPos, y, x);
+	        var matched = this._hitTest(note);
+	        if (matched >= 0) {
+	            this.notes.splice(matched, 1);
+	        }
+	        else {
+	            this.notes.push(note);
+	        }
+	        this.draw();
+	        this.clicked = false;
+	    };
 	    PianoRoll.prototype._drawAllNotes = function () {
 	        var _this = this;
 	        this.notes.forEach(function (note) {
@@ -192,6 +217,16 @@
 	    return (n.no === note.no &&
 	        n.start <= note.start &&
 	        n.start + n.length - 1 >= note.start);
+	}
+	function convertTouchEvent(e) {
+	    var dom = e.target;
+	    var rect = dom.getBoundingClientRect();
+	    var x = e.targetTouches[0].pageX - rect.left;
+	    var y = e.targetTouches[0].pageY - rect.top;
+	    return {
+	        x: x,
+	        y: y
+	    };
 	}
 
 
