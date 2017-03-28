@@ -58,43 +58,76 @@ export class PianoRoll {
     }, timebase)
 
     this.el.addEventListener("mousemove", (e: MouseEvent) => {
-      var note = this.drv.createNote(1, e.offsetX, e.offsetY, 1);
-      if (this.clicked) {
-        note = this.drv.createNoteWithLength(1, this.startPos, e.offsetY, e.offsetX);
-        if (this.nowNote !== note.no) {
-          playNote({
-            noteNumber: note.no + 48
-          }, 100);
-          this.nowNote = note.no
-        }
-      }
-      this.hoverNote = note
-      this.draw();
+      this.onMouseMove(e.offsetX, e.offsetY)
     });
 
     this.el.addEventListener("mousedown", (e) => {
-      var note = this.drv.createNote(1, e.offsetX, e.offsetY, 1);
-      this.nowNote = note.no
-      this.startPos = note.start
-      playNote({
-        noteNumber: note.no + 48
-      }, 100);
-      this.draw();
-      this.clicked = true
+      e.preventDefault();
+      this.onMouseDown(e.offsetX, e.offsetY)
     })
 
     this.el.addEventListener("mouseup", (e: MouseEvent) => {
-      var note = this.drv.createNoteWithLength(1, this.startPos, e.offsetY, e.offsetX);
-      var matched = this._hitTest(note);
-      if (matched >= 0) {
-        this.notes.splice(matched, 1);
-      } else {
-        this.notes.push(note);
-      }
-      this.draw();
-      this.clicked = false
+      e.preventDefault();
+      this.onMouseUp(e.offsetX, e.offsetY)
     });
+
+    this.el.addEventListener("touchmove", (e) => {
+      let pos = convertTouchEvent(e)
+      this.onMouseMove(pos.x, pos.y)
+    })
+    this.el.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      let pos = convertTouchEvent(e)
+      this.onMouseDown(pos.x, pos.y)
+    })
+    this.el.addEventListener("touchend", (e) => {
+      e.preventDefault();
+      let pos = convertTouchEvent(e)
+      this.onMouseUp(pos.x, pos.y)
+    })
   }
+
+  onMouseDown(x: number, y: number) {
+    var note = this.drv.createNote(1, x, y, 1);
+    this.nowNote = note.no
+    this.startPos = note.start
+    playNote({
+      noteNumber: note.no + 48
+    }, 100);
+    this.draw();
+    this.clicked = true
+  }
+
+  onMouseMove(x: number, y: number) {
+    var note = this.drv.createNote(1, x, y, 1);
+    if (this.clicked) {
+      note = this.drv.createNoteWithLength(1, this.startPos, y, x);
+      if (this.nowNote !== note.no) {
+        playNote({
+          noteNumber: note.no + 48
+        }, 100);
+        this.nowNote = note.no
+      }
+    }
+    this.hoverNote = note
+    this.draw();
+  }
+
+  onMouseUp(x: number, y: number) {
+    alert("mo")
+    var note = this.drv.createNoteWithLength(1, this.startPos, y, x);
+    var matched = this._hitTest(note);
+    if (matched >= 0) {
+      alert("hit fail")
+      this.notes.splice(matched, 1);
+    } else {
+      alert("pushed")
+      this.notes.push(note);
+    }
+    this.draw();
+    this.clicked = false
+  }
+
 
   _drawAllNotes() {
     this.notes.forEach((note: Note) => {
@@ -139,4 +172,15 @@ function _isHit(n: Note, note: Note) {
     n.start <= note.start &&
     n.start + n.length - 1 >= note.start
   )
+}
+
+function convertTouchEvent(e: TouchEvent) {
+  var dom = <HTMLElement>e.target
+  var rect = dom.getBoundingClientRect();
+  var x = e.targetTouches[0].pageX - rect.left;
+  var y = e.targetTouches[0].pageY - rect.top;
+  return {
+    x: x,
+    y: y
+  }
 }
