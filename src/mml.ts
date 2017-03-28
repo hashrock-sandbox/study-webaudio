@@ -46,11 +46,14 @@ export function noteToNote(note: Note) {
   return `o${oct}${cde}${lengthArray.join("^")}`
 }
 
+
+const mmlTemplate = "l16v10"
+
 export function jsonToMML(notes: Note[]) {
   let remainNotes = [...notes];
   let mmls: string[] = []
 
-  let mml = "l16"
+  let mml = mmlTemplate
 
   //変換戦略：
   //1ステップずつノートがあるか見ていき、マッチしたノートをMMLに詰めて配列から削除し、発音長だけ飛ばす。
@@ -81,11 +84,10 @@ export function jsonToMML(notes: Note[]) {
       }
     }
 
-    console.log(remainNotes)
     //まだNoteが残っているようなら、また最初から
     i = 0;
     mmls.push(mml)
-    mml = ""
+    mml = mmlTemplate
   }
 
   return mmls
