@@ -91,6 +91,8 @@ export class PianoRoll {
     var note = this.drv.createNote(1, x, y, 1);
     this.nowNote = note.no
     this.startPos = note.start
+
+    // 0 = C3
     playNote({
       noteNumber: note.no + 48
     }, 100);

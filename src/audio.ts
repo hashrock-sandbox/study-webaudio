@@ -12,7 +12,6 @@ export function playNote(noteNumber: number, length: number){
   amp.connect(audioContext.destination);
   setTimeout(function () {
     var now = audioContext.currentTime;
-    console.log(now)
     amp.gain.setValueAtTime(amp.gain.value, now);
     amp.gain.linearRampToValueAtTime(0, now + release);
     //osc1.disconnect();

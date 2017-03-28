@@ -54,8 +54,22 @@ export class DrawingDriver {
     return Math.floor(x / this.noteWidth)
   }
 
-  clear() {
-    this.ctx.clearRect(0, 0, this.w, this.h);
+  drawKeyboard(){
+    this.ctx.fillStyle = "#BBBBBB"
+    for(let i = 0; i < NOTE_RANGE; i++){
+      if(
+        i % 12 === 1 || 
+        i % 12 === 3 || 
+        i % 12 === 6 || 
+        i % 12 === 8 || 
+        i % 12 === 10
+      ){
+        this.ctx.fillRect(0, this.h - i * this.noteHeight, this.w, -this.noteHeight)
+      }
+    }
+  }
+
+  drawGridLines(){
     this.ctx.save()
     this.ctx.lineWidth = 1;
     this.ctx.strokeStyle = "#AAAAAA";
@@ -78,6 +92,14 @@ export class DrawingDriver {
 
     this.ctx.restore();
   }
+
+  clear() {
+    this.ctx.clearRect(0, 0, this.w, this.h);
+
+    this.drawKeyboard()
+    this.drawGridLines()
+  }
+  
   createNoteWithLength(ch: number, x: number, y: number, x1: number) {
     return new Note({
       ch: ch,
