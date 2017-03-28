@@ -1,12 +1,12 @@
 import { Note } from "./note"
 
 export function toNoteName(index: number) {
-  if(index < 0 || index > 11){
+  if (index < 0 || index > 11) {
     console.error("invalid note index")
     return null
   }
   return [
-    "c", "d-", "d", "e-", "e", "f", "g-", "g", "a-", "a", "b"
+    "c", "d-", "d", "e-", "e", "f", "g-", "g", "a-", "a", "b-", "b"
   ][index]
 }
 
@@ -16,28 +16,28 @@ export function noteToNote(note: Note) {
 
   let lengthRemain = note.length
   let lengthArray = []
-  while(lengthRemain > 0){
-    if(lengthRemain >= 16){
+  while (lengthRemain > 0) {
+    if (lengthRemain >= 16) {
       lengthRemain -= 16
       lengthArray.push("1")
       continue
     }
-    if(lengthRemain >= 8){
+    if (lengthRemain >= 8) {
       lengthRemain -= 8
       lengthArray.push("2")
       continue
     }
-    if(lengthRemain >= 4){
+    if (lengthRemain >= 4) {
       lengthRemain -= 4
       lengthArray.push("4")
       continue
     }
-    if(lengthRemain >= 2){
+    if (lengthRemain >= 2) {
       lengthRemain -= 2
       lengthArray.push("8")
       continue
     }
-    if(lengthRemain >= 1){
+    if (lengthRemain >= 1) {
       lengthRemain -= 1
       lengthArray.push("16")
       continue
@@ -56,25 +56,25 @@ export function jsonToMML(notes: Note[]) {
   //1ステップずつノートがあるか見ていき、マッチしたノートをMMLに詰めて配列から削除し、発音長だけ飛ばす。
   //48ステップの走査終了後、まだノートが残っているようならもう一度走査。
   //最終的に同時発音数分のトラックが生成される。
-  while(remainNotes.length > 0){
+  while (remainNotes.length > 0) {
     let i = 0;
-    while(i < 48){
+    while (i < 48) {
       // 頭から走査する
       // find使いたい…
       let matchedIndex = -1;
-      for(let j = 0; j < remainNotes.length; j++){
-        if(remainNotes[j].start === i){
+      for (let j = 0; j < remainNotes.length; j++) {
+        if (remainNotes[j].start === i) {
           matchedIndex = j
           break
         }
       }
-      if(matchedIndex !== -1){
+      if (matchedIndex !== -1) {
         console.log(matchedIndex + " found")
         //マッチした要素を削除
         mml += noteToNote(remainNotes[matchedIndex])
         i += remainNotes[matchedIndex].length
         remainNotes.splice(matchedIndex, 1)
-      }else{
+      } else {
         //なにもマッチしなかったので休符
         mml += "r"
         i += 1
