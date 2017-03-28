@@ -146,6 +146,7 @@
 	        var note = this.drv.createNote(1, x, y, 1);
 	        this.nowNote = note.no;
 	        this.startPos = note.start;
+	        // 0 = C3
 	        playNote({
 	            noteNumber: note.no + 48
 	        }, 100);
@@ -272,8 +273,19 @@
 	    DrawingDriver.prototype.getX = function (x) {
 	        return Math.floor(x / this.noteWidth);
 	    };
-	    DrawingDriver.prototype.clear = function () {
-	        this.ctx.clearRect(0, 0, this.w, this.h);
+	    DrawingDriver.prototype.drawKeyboard = function () {
+	        this.ctx.fillStyle = "#BBBBBB";
+	        for (var i = 0; i < NOTE_RANGE; i++) {
+	            if (i % 12 === 1 ||
+	                i % 12 === 3 ||
+	                i % 12 === 6 ||
+	                i % 12 === 8 ||
+	                i % 12 === 10) {
+	                this.ctx.fillRect(0, this.h - i * this.noteHeight, this.w, -this.noteHeight);
+	            }
+	        }
+	    };
+	    DrawingDriver.prototype.drawGridLines = function () {
 	        this.ctx.save();
 	        this.ctx.lineWidth = 1;
 	        this.ctx.strokeStyle = "#AAAAAA";
@@ -293,6 +305,11 @@
 	        this.ctx.lineTo(this.playPosition * this.noteWidth, this.h);
 	        this.ctx.stroke();
 	        this.ctx.restore();
+	    };
+	    DrawingDriver.prototype.clear = function () {
+	        this.ctx.clearRect(0, 0, this.w, this.h);
+	        this.drawKeyboard();
+	        this.drawGridLines();
 	    };
 	    DrawingDriver.prototype.createNoteWithLength = function (ch, x, y, x1) {
 	        return new note_1.Note({
@@ -349,13 +366,18 @@
 	function playNote(noteNumber, length) {
 	    var osc1 = audioContext.createOscillator();
 	    var amp = audioContext.createGain();
+	    var release = 0.05;
 	    osc1.frequency.value = util.mtof(noteNumber);
 	    osc1.connect(amp);
 	    amp.gain.value = 0.1;
 	    osc1.start();
 	    amp.connect(audioContext.destination);
 	    setTimeout(function () {
-	        osc1.disconnect();
+	        var now = audioContext.currentTime;
+	        amp.gain.setValueAtTime(amp.gain.value, now);
+	        amp.gain.linearRampToValueAtTime(0, now + release);
+	        //osc1.disconnect();
+	        osc1.stop(now + release);
 	    }, length);
 	}
 	exports.playNote = playNote;
