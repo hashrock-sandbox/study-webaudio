@@ -47,6 +47,7 @@
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var pianoroll_1 = __webpack_require__(1);
+	var mml = __webpack_require__(6);
 	var el = document.querySelector(".canvas");
 	var piano = new pianoroll_1.PianoRoll({
 	    el: el,
@@ -66,6 +67,13 @@
 	}
 	playButton.addEventListener("click", function () {
 	    togglePlaying();
+	});
+	var exportSource = document.querySelector("#export-source");
+	document.querySelector("#export-json").addEventListener("click", function () {
+	    exportSource.value = JSON.stringify(piano.notes, null, 2);
+	});
+	document.querySelector("#export-mml").addEventListener("click", function () {
+	    exportSource.value = mml.jsonToMML(piano.notes).join(";\n");
 	});
 	document.addEventListener("keypress", function (e) {
 	    if (e.keyCode === 32) {
@@ -393,6 +401,101 @@
 	    return 440 * Math.pow(2, (noteNumber - 69) / 12);
 	}
 	exports.mtof = mtof;
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	function toNoteName(index) {
+	    if (index < 0 || index > 11) {
+	        console.error("invalid note index");
+	        return null;
+	    }
+	    return [
+	        "c", "d-", "d", "e-", "e", "f", "g-", "g", "a-", "a", "b"
+	    ][index];
+	}
+	exports.toNoteName = toNoteName;
+	function noteToNote(note) {
+	    var oct = Math.floor(note.no / 12) + 3;
+	    var cde = toNoteName(note.no % 12);
+	    var lengthRemain = note.length;
+	    var lengthArray = [];
+	    while (lengthRemain > 0) {
+	        if (lengthRemain >= 16) {
+	            lengthRemain -= 16;
+	            lengthArray.push("1");
+	            continue;
+	        }
+	        if (lengthRemain >= 8) {
+	            lengthRemain -= 8;
+	            lengthArray.push("2");
+	            continue;
+	        }
+	        if (lengthRemain >= 4) {
+	            lengthRemain -= 4;
+	            lengthArray.push("4");
+	            continue;
+	        }
+	        if (lengthRemain >= 2) {
+	            lengthRemain -= 2;
+	            lengthArray.push("8");
+	            continue;
+	        }
+	        if (lengthRemain >= 1) {
+	            lengthRemain -= 1;
+	            lengthArray.push("16");
+	            continue;
+	        }
+	    }
+	    return "o" + oct + cde + lengthArray.join("^");
+	}
+	exports.noteToNote = noteToNote;
+	function jsonToMML(notes) {
+	    var remainNotes = notes.slice();
+	    var mmls = [];
+	    var mml = "l16";
+	    //変換戦略：
+	    //1ステップずつノートがあるか見ていき、マッチしたノートをMMLに詰めて配列から削除し、発音長だけ飛ばす。
+	    //48ステップの走査終了後、まだノートが残っているようならもう一度走査。
+	    //最終的に同時発音数分のトラックが生成される。
+	    while (remainNotes.length > 0) {
+	        var i = 0;
+	        while (i < 48) {
+	            // 頭から走査する
+	            // find使いたい…
+	            var matchedIndex = -1;
+	            for (var j = 0; j < remainNotes.length; j++) {
+	                if (remainNotes[j].start === i) {
+	                    matchedIndex = j;
+	                    break;
+	                }
+	            }
+	            if (matchedIndex !== -1) {
+	                console.log(matchedIndex + " found");
+	                //マッチした要素を削除
+	                mml += noteToNote(remainNotes[matchedIndex]);
+	                i += remainNotes[matchedIndex].length;
+	                remainNotes.splice(matchedIndex, 1);
+	            }
+	            else {
+	                //なにもマッチしなかったので休符
+	                mml += "r";
+	                i += 1;
+	            }
+	        }
+	        console.log(remainNotes);
+	        //まだNoteが残っているようなら、また最初から
+	        i = 0;
+	        mmls.push(mml);
+	        mml = "";
+	    }
+	    return mmls;
+	}
+	exports.jsonToMML = jsonToMML;
 
 
 /***/ }
