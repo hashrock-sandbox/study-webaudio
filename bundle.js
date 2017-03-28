@@ -415,7 +415,7 @@
 	        return null;
 	    }
 	    return [
-	        "c", "d-", "d", "e-", "e", "f", "g-", "g", "a-", "a", "b"
+	        "c", "d-", "d", "e-", "e", "f", "g-", "g", "a-", "a", "b-", "b"
 	    ][index];
 	}
 	exports.toNoteName = toNoteName;
