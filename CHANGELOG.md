@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.4.0"></a>
+# [1.4.0](https://github.com/hashrock-sandbox/minroll/compare/v1.1.0...v1.4.0) (2017-05-04)
+
+
+### Bug Fixes
+
+* **app:** fix play pos ([e39b213](https://github.com/hashrock-sandbox/minroll/commit/e39b213))
+* **audio:** remove click noise ([ed04c65](https://github.com/hashrock-sandbox/minroll/commit/ed04c65))
+* **index:** styling ([d515f76](https://github.com/hashrock-sandbox/minroll/commit/d515f76))
+* **mml:** oop, I forgot b- ([deff7bf](https://github.com/hashrock-sandbox/minroll/commit/deff7bf))
+* **touch:** Support touch events ([42bc9f2](https://github.com/hashrock-sandbox/minroll/commit/42bc9f2))
+
+
+### Features
+
+* **canvas:** draw semitone backgrounds ([7c74115](https://github.com/hashrock-sandbox/minroll/commit/7c74115))
+* **main:** SMF export ([f78cc7b](https://github.com/hashrock-sandbox/minroll/commit/f78cc7b))
+* **mml:** MML変換ロジックの作成 ([b2c21a8](https://github.com/hashrock-sandbox/minroll/commit/b2c21a8))
+* **mml:** tsscc integration ([857fd42](https://github.com/hashrock-sandbox/minroll/commit/857fd42))
+* **pianoroll:** add grid ([b953904](https://github.com/hashrock-sandbox/minroll/commit/b953904))
+* **shortcut:** space to play ([3e85a32](https://github.com/hashrock-sandbox/minroll/commit/3e85a32))
+
+
+
 <a name="1.3.0"></a>
 # [1.3.0](https://github.com/hashrock/minroll/compare/v1.2.0...v1.3.0) (2017-03-28)
 
