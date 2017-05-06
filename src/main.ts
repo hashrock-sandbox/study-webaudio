@@ -9,8 +9,6 @@ var piano: PianoRoll
 
 let playing = false;
 
-let playButton = document.querySelector("#play")
-
 function togglePlaying(){
   if(playing){
     piano.stop();
@@ -20,23 +18,6 @@ function togglePlaying(){
     playing = true
   }
 }
-playButton.addEventListener("click", ()=>{
-  togglePlaying()
-})
-
-let exportSource = <HTMLTextAreaElement>document.querySelector("#export-source")
-document.querySelector("#export-json").addEventListener("click", ()=>{
-  exportSource.value = JSON.stringify(piano.notes, null, 2)
-})
-document.querySelector("#export-mml").addEventListener("click", ()=>{
-  exportSource.value = mml.jsonToMML(piano.notes).join(";\n")
-})
-
-document.querySelector("#export-smf").addEventListener("click", ()=>{
-  //現在、ch1のみ。ボリューム指定は0-15を0-127に変換する必要があるが、対数にすべきか不明なのでとりあえず固定値にした
-  let binary = mml2smf(mml.jsonToMML(piano.notes).map(line=>"C1"+line).join(";\n").replace(/v10/g, "v80"))
-  downloadBlob(binary, 'minroll.mid', 'application/octet-stream');
-})
 
 function downloadBlob(data : Uint8Array, fileName: string, mimeType :string) {
   let blob = new Blob([data], {
@@ -69,17 +50,31 @@ document.addEventListener("keypress", (e)=>{
 
 new Vue({
   el: "#app",
+  data: {
+    source: ""
+  },
   mounted: function(){
     var el: HTMLCanvasElement = <HTMLCanvasElement>document.querySelector(".canvas");
     piano = new PianoRoll({
       el: el,
-      notes: []
+      notes: [],
     });
     piano.draw();
   },
   methods: {
     exportJson: function(){
-      
+      this.source = JSON.stringify(piano.notes, null, 2)
+    },
+    exportMml: function(){
+      this.source = mml.jsonToMML(piano.notes).join(";\n")
+    },
+    exportSmf: function(){
+      //現在、ch1のみ。ボリューム指定は0-15を0-127に変換する必要があるが、対数にすべきか不明なのでとりあえず固定値にした
+      let binary = mml2smf(mml.jsonToMML(piano.notes).map(line=>"C1"+line).join(";\n").replace(/v10/g, "v80"))
+      downloadBlob(binary, 'minroll.mid', 'application/octet-stream');
+    },
+    play: function(){
+      togglePlaying()
     }
   }
 })
