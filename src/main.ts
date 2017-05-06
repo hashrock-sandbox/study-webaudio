@@ -47,13 +47,11 @@ new Vue({
   },
   methods: {
     exportJson: function(e: MouseEvent){
-      e.stopPropagation()
       this.hideMenu();
       this.isExportDialogVisible = true;
       this.source = JSON.stringify(piano.notes, null, 2)
     },
     exportMml: function(e: MouseEvent){
-      e.stopPropagation()
       this.hideMenu();
       this.isExportDialogVisible = true;
       this.source = mml.jsonToMML(piano.notes).join(";\n")

@@ -13,8 +13,8 @@
   <div id="app">
     <div class="fade" v-if="isMenuVisible || isExportDialogVisible" @click="hideMenu">
       <div class="rightmenu" v-if="isMenuVisible">
-        <div class="rightmenu__item" @click="exportJson">Export to JSON</div>
-        <div class="rightmenu__item" @click="exportMml">Export to MML</div>
+        <div class="rightmenu__item" @click.stop="exportJson">Export to JSON</div>
+        <div class="rightmenu__item" @click.stop="exportMml">Export to MML</div>
         <div class="rightmenu__item" @click="exportSmf">Export to MIDI File</div>
       </div>
 
