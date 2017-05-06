@@ -51,7 +51,9 @@ document.addEventListener("keypress", (e)=>{
 new Vue({
   el: "#app",
   data: {
-    source: ""
+    source: "",
+    isMenuVisible: false,
+    isExportDialogVisible: false,
   },
   mounted: function(){
     var el: HTMLCanvasElement = <HTMLCanvasElement>document.querySelector(".canvas");
@@ -62,10 +64,16 @@ new Vue({
     piano.draw();
   },
   methods: {
-    exportJson: function(){
+    exportJson: function(e: MouseEvent){
+      e.stopPropagation()
+      this.hideMenu();
+      this.isExportDialogVisible = true;
       this.source = JSON.stringify(piano.notes, null, 2)
     },
-    exportMml: function(){
+    exportMml: function(e: MouseEvent){
+      e.stopPropagation()
+      this.hideMenu();
+      this.isExportDialogVisible = true;
       this.source = mml.jsonToMML(piano.notes).join(";\n")
     },
     exportSmf: function(){
@@ -75,6 +83,14 @@ new Vue({
     },
     play: function(){
       togglePlaying()
+    },
+    hideMenu: function(){
+      this.isMenuVisible = false;
+      this.isExportDialogVisible = false;
+    },
+    showMenu: function(){
+      this.isMenuVisible = true;
+      this.isExportDialogVisible = false;
     }
   }
 })

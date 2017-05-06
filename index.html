@@ -6,51 +6,41 @@
   <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1">
   <title>minroll</title>
   <link href="https://fonts.googleapis.com/css?family=Raleway:200" rel="stylesheet">
-  <style>
-    canvas {
-      background: #ccc;
-    }
-    
-    body {
-      user-select: none;
-      font-family: 'Raleway', sans-serif;
-      text-align: center;
-      background: #3a3a3a;
-      color: white;
-    }
-    
-    .bottom-nav {
-      margin: 1rem;
-    }
-
-    textarea{
-      font-size: 15px;
-      width: 400px;
-      height: 300px;
-    }
-    a{
-      color: white;
-    }
-  </style>
+  <link rel="stylesheet" href="./index.css">
 </head>
 
 <body>
   <div id="app">
-    <h1>Minroll</h1>
-    <p>minimal pianoroll sequencer</p>
-    <canvas class="canvas" width="400" height="300"></canvas>
-    <div class="bottom-nav">
-      <button @click="play" class="button is-small">Play / Stop</button>
-      <button @click="exportJson">Export to JSON</button>
-      <button @click="exportMml">Export to MML</button>
-      <button @click="exportSmf">Export to MIDI File</button>
-    </div>
-    <div>
-      <textarea v-model="source"></textarea>
+    <div class="fade" v-if="isMenuVisible || isExportDialogVisible" @click="hideMenu">
+      <div class="rightmenu" v-if="isMenuVisible">
+        <div class="rightmenu__item" @click="exportJson">Export to JSON</div>
+        <div class="rightmenu__item" @click="exportMml">Export to MML</div>
+        <div class="rightmenu__item" @click="exportSmf">Export to MIDI File</div>
+      </div>
+
+      <div class="export-dialog" v-if="isExportDialogVisible" @click.stop>
+        <textarea v-model="source"></textarea>
+        <a href="http://d.hatena.ne.jp/aike/20160822">TSS Ctrl-C MML Player</a> 互換のMMLを出力します。
+
+      </div>
     </div>
 
-    <div>
-      <a href="http://d.hatena.ne.jp/aike/20160822">TSS Ctrl-C MML Player</a> 互換のMMLを出力します。
+
+    <nav class="menu">
+      <div class="menu__logo">
+        minroll
+      </div>
+
+      <div class="menu__open" @click="showMenu">
+        Menu
+      </div>
+    </nav>
+    <div class="editor">
+      <canvas class="canvas" width="400" height="300"></canvas>
+      <div class="bottom-nav">
+        <button @click="play" class="button is-small">Play / Stop</button>
+      </div>
+
     </div>
 
   </div>
