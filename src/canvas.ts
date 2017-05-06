@@ -33,7 +33,8 @@ export class DrawingDriver {
   constructor(ctx: CanvasRenderingContext2D, w: number, h: number) {
     this.w = w;
     this.h = h;
-    this.noteWidth = this.w / PATTERN_LENGTH;
+//    this.noteWidth = this.w / PATTERN_LENGTH;
+    this.noteWidth = 32;
     this.noteHeight = this.h / NOTE_RANGE;
     this.ctx = ctx;
     this.scale = NoteScale(this.noteWidth, this.noteHeight);
@@ -73,10 +74,16 @@ export class DrawingDriver {
     this.ctx.save()
     this.ctx.lineWidth = 1;
     this.ctx.strokeStyle = "#AAAAAA";
-    this.ctx.beginPath();
     for(let i = 0; i < PATTERN_LENGTH; i++){
+      this.ctx.beginPath();
+      if(i % 4 === 0){
+        this.ctx.strokeStyle = "#777777";
+      }else{
+        this.ctx.strokeStyle = "#AAAAAA";
+      }
       this.ctx.moveTo(i * this.noteWidth, 0)
       this.ctx.lineTo(i * this.noteWidth, this.h)
+      this.ctx.stroke()
     }
     for(let i = 0; i < NOTE_RANGE; i++){
       this.ctx.moveTo(0, i * this.noteHeight)

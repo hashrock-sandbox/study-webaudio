@@ -54,6 +54,7 @@ new Vue({
     source: "",
     isMenuVisible: false,
     isExportDialogVisible: false,
+    patternLength: "32"
   },
   mounted: function(){
     var el: HTMLCanvasElement = <HTMLCanvasElement>document.querySelector(".canvas");
