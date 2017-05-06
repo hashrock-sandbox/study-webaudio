@@ -41,23 +41,28 @@
 @media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}
 </style>
 
-  <h1>Minroll</h1>
-  <p>minimal pianoroll sequencer</p>
-  <canvas class="canvas" width="400" height="300"></canvas>
-  <div class="bottom-nav">
-    <button class="button is-small" id="play">Play / Stop</button>
-    <button id="export-json">Export to JSON</button>
-    <button id="export-mml">Export to MML</button>
-    <button id="export-smf">Export to MIDI File</button>
-  </div>
-  <div>
-    <textarea id="export-source"></textarea>
+  <div id="app">
+    <h1>Minroll</h1>
+    <p>minimal pianoroll sequencer</p>
+    <canvas class="canvas" width="400" height="300"></canvas>
+    <div class="bottom-nav">
+      <button class="button is-small" id="play">Play / Stop</button>
+      <button id="export-json">Export to JSON</button>
+      <button id="export-mml">Export to MML</button>
+      <button id="export-smf">Export to MIDI File</button>
+    </div>
+    <div>
+      <textarea id="export-source"></textarea>
+    </div>
+
+    <div>
+      <a href="http://d.hatena.ne.jp/aike/20160822">TSS Ctrl-C MML Player</a> 互換のMMLを出力します。
+    </div>
+
   </div>
 
-  <div>
-    <a href="http://d.hatena.ne.jp/aike/20160822">TSS Ctrl-C MML Player</a> 互換のMMLを出力します。
-  </div>
 
+  <script src="./vue.js"></script>
   <script src="./bundle.js"></script>
 </body>
 

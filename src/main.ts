@@ -1,12 +1,11 @@
+declare var require:any
+declare var Vue:any
+
 import {PianoRoll} from "./pianoroll"
 import * as mml from "./mml"
-import * as mml2smf from "mml2smf"
+const mml2smf = require("mml2smf")
 
-var el: HTMLCanvasElement = <HTMLCanvasElement>document.querySelector(".canvas");
-var piano: PianoRoll = new PianoRoll({
-  el: el,
-  notes: []
-});
+var piano: PianoRoll
 
 let playing = false;
 
@@ -61,12 +60,26 @@ function downloadURL(data:string, fileName:string) {
   a.remove();
 };
 
-//downloadBlob(myBinaryBlob, 'some-file.bin', 'application/octet-stream');
-
 document.addEventListener("keypress", (e)=>{
   if(e.keyCode === 32){
     togglePlaying()
   }
 })
 
-piano.draw();
+
+new Vue({
+  el: "#app",
+  mounted: function(){
+    var el: HTMLCanvasElement = <HTMLCanvasElement>document.querySelector(".canvas");
+    piano = new PianoRoll({
+      el: el,
+      notes: []
+    });
+    piano.draw();
+  },
+  methods: {
+    exportJson: function(){
+      
+    }
+  }
+})
