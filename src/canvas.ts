@@ -29,6 +29,7 @@ export class DrawingDriver {
   ctx: CanvasRenderingContext2D;
   scale: (x: number, y: number, w: number, h: number) => NoteScaleData;
   playPosition: number
+  _patternLength: number
 
   constructor(ctx: CanvasRenderingContext2D, w: number, h: number) {
     this.w = w;
@@ -42,6 +43,12 @@ export class DrawingDriver {
   _drawRect(x: number, y: number, w: number, h: number, color: string) {
     this.ctx.fillStyle = color;
     this.ctx.fillRect(x, y, w, h);
+  }
+
+  set patternLength(value: number){
+    this._patternLength = value
+    this.w = value * 32
+    this.clear()
   }
 
   drawNote(note: Note, color: string) {
@@ -74,7 +81,7 @@ export class DrawingDriver {
     this.ctx.save()
     this.ctx.lineWidth = 1;
     this.ctx.strokeStyle = "#AAAAAA";
-    for(let i = 0; i < PATTERN_LENGTH; i++){
+    for(let i = 0; i < this._patternLength; i++){
       this.ctx.beginPath();
       if(i % 4 === 0){
         this.ctx.strokeStyle = "#777777";

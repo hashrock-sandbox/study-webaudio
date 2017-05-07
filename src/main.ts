@@ -42,8 +42,14 @@ new Vue({
     piano = new PianoRoll({
       el: el,
       notes: [],
+      patternLength: 32
     });
     piano.draw();
+  },
+  watch:{
+    "patternLength": function(value: string){
+      piano.patternLength = parseInt(value)
+    }
   },
   methods: {
     exportJson: function(e: MouseEvent){
