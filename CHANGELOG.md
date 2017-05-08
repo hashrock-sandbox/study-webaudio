@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.5.0"></a>
+# [1.5.0](https://github.com/hashrock-sandbox/minroll/compare/v1.4.0...v1.5.0) (2017-05-08)
+
+
+### Bug Fixes
+
+* **main:** fix note width ([49f29d1](https://github.com/hashrock-sandbox/minroll/commit/49f29d1))
+* **menu:** create menu UI ([bf79b36](https://github.com/hashrock-sandbox/minroll/commit/bf79b36))
+
+
+### Features
+
+* **app:** add patternLength ([f395712](https://github.com/hashrock-sandbox/minroll/commit/f395712))
+
+
+
 <a name="1.4.0"></a>
 # [1.4.0](https://github.com/hashrock-sandbox/minroll/compare/v1.1.0...v1.4.0) (2017-05-04)
 
