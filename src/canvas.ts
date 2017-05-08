@@ -55,11 +55,19 @@ export class DrawingDriver {
     var t = this.scale(note.start, note.no, note.length, 1);
     this._drawRect(t.x, this.h - t.y - t.h, t.w, t.h, color);
   }
-  getY(y: number) {
+  getNoteY(y: number) {
     return Math.floor((this.h - y) / this.noteHeight)
   }
-  getX(x: number) {
+  getNoteX(x: number) {
     return Math.floor(x / this.noteWidth)
+  }
+  toScreen(n: Note){
+    return {
+      x: n.start * this.noteWidth,
+      y: this.h - (n.no + 1) * this.noteHeight,
+      h: this.noteHeight,
+      w: this.noteWidth
+    }
   }
 
   drawKeyboard(){
@@ -118,24 +126,24 @@ export class DrawingDriver {
     return new Note({
       ch: ch,
       start: x,
-      note: this.getY(y),
-      end: this.getX(x1) - x + 1
+      note: this.getNoteY(y),
+      end: this.getNoteX(x1) - x + 1
     });
   }
 
   createNote(ch: number, x: number, y: number, len: number) {
     return new Note({
       ch: ch,
-      start: this.getX(x),
-      note: this.getY(y),
+      start: this.getNoteX(x),
+      note: this.getNoteY(y),
       end: len
     });
   }
   hitTest(note: Note, x: number, y: number) {
     return (
-      note.start <= this.getX(x) &&
-      note.start + note.length >= this.getX(x) &&
-      this.getY(y) === note.no
+      note.start <= this.getNoteX(x) &&
+      note.start + note.length >= this.getNoteX(x) &&
+      this.getNoteY(y) === note.no
     )
   }
 }

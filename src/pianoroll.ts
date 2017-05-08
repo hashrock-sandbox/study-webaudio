@@ -121,6 +121,10 @@ export class PianoRoll {
         this.nowNote = note.no
       }
     }
+    /*
+    let ret = this.drv.toScreen(note)
+    console.log(ret)
+    */
     this.hoverNote = note
     this.draw();
   }
@@ -193,3 +197,4 @@ function convertTouchEvent(e: TouchEvent) {
     y: y
   }
 }
+
