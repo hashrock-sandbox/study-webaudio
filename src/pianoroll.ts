@@ -12,7 +12,8 @@ function playNote(e: NoteEvent, length: number) {
 
 interface PianoRollOptions {
   el: HTMLCanvasElement,
-  notes: Note[]
+  notes: Note[],
+  patternLength: number
 }
 
 export class PianoRoll {
@@ -29,12 +30,14 @@ export class PianoRoll {
   constructor(options: PianoRollOptions) {
     this.el = options.el;
     this.notes = options.notes ? options.notes : [];
+    this.patternLength = options.patternLength ? options.patternLength : 32;
     this.drv = new DrawingDriver(this.el.getContext("2d"), this.el.offsetWidth, this.el.offsetHeight);
     this.hoverNote = null;
     this.clicked = false;
     this.nowNote = -1;
     this.playing = false;
     this.playingPos = -1;
+    this.drv.patternLength = options.patternLength
 
     let bpm = 120
     let timebase = 60000 / bpm / 4;
@@ -87,6 +90,13 @@ export class PianoRoll {
     })
   }
 
+  set patternLength(value: number){
+    if(this.drv){
+      this.drv.patternLength = value
+      this.el.width = value * 32
+    }
+  }
+
   onMouseDown(x: number, y: number) {
     var note = this.drv.createNote(1, x, y, 1);
     this.nowNote = note.no
@@ -111,6 +121,10 @@ export class PianoRoll {
         this.nowNote = note.no
       }
     }
+    /*
+    let ret = this.drv.toScreen(note)
+    console.log(ret)
+    */
     this.hoverNote = note
     this.draw();
   }
@@ -183,3 +197,4 @@ function convertTouchEvent(e: TouchEvent) {
     y: y
   }
 }
+

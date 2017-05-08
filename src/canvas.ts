@@ -29,11 +29,13 @@ export class DrawingDriver {
   ctx: CanvasRenderingContext2D;
   scale: (x: number, y: number, w: number, h: number) => NoteScaleData;
   playPosition: number
+  _patternLength: number
 
   constructor(ctx: CanvasRenderingContext2D, w: number, h: number) {
     this.w = w;
     this.h = h;
-    this.noteWidth = this.w / PATTERN_LENGTH;
+//    this.noteWidth = this.w / PATTERN_LENGTH;
+    this.noteWidth = 32;
     this.noteHeight = this.h / NOTE_RANGE;
     this.ctx = ctx;
     this.scale = NoteScale(this.noteWidth, this.noteHeight);
@@ -43,15 +45,29 @@ export class DrawingDriver {
     this.ctx.fillRect(x, y, w, h);
   }
 
+  set patternLength(value: number){
+    this._patternLength = value
+    this.w = value * 32
+    this.clear()
+  }
+
   drawNote(note: Note, color: string) {
     var t = this.scale(note.start, note.no, note.length, 1);
     this._drawRect(t.x, this.h - t.y - t.h, t.w, t.h, color);
   }
-  getY(y: number) {
+  getNoteY(y: number) {
     return Math.floor((this.h - y) / this.noteHeight)
   }
-  getX(x: number) {
+  getNoteX(x: number) {
     return Math.floor(x / this.noteWidth)
+  }
+  toScreen(n: Note){
+    return {
+      x: n.start * this.noteWidth,
+      y: this.h - (n.no + 1) * this.noteHeight,
+      h: this.noteHeight,
+      w: this.noteWidth
+    }
   }
 
   drawKeyboard(){
@@ -73,10 +89,16 @@ export class DrawingDriver {
     this.ctx.save()
     this.ctx.lineWidth = 1;
     this.ctx.strokeStyle = "#AAAAAA";
-    this.ctx.beginPath();
-    for(let i = 0; i < PATTERN_LENGTH; i++){
+    for(let i = 0; i < this._patternLength; i++){
+      this.ctx.beginPath();
+      if(i % 4 === 0){
+        this.ctx.strokeStyle = "#777777";
+      }else{
+        this.ctx.strokeStyle = "#AAAAAA";
+      }
       this.ctx.moveTo(i * this.noteWidth, 0)
       this.ctx.lineTo(i * this.noteWidth, this.h)
+      this.ctx.stroke()
     }
     for(let i = 0; i < NOTE_RANGE; i++){
       this.ctx.moveTo(0, i * this.noteHeight)
@@ -104,24 +126,24 @@ export class DrawingDriver {
     return new Note({
       ch: ch,
       start: x,
-      note: this.getY(y),
-      end: this.getX(x1) - x + 1
+      note: this.getNoteY(y),
+      end: this.getNoteX(x1) - x + 1
     });
   }
 
   createNote(ch: number, x: number, y: number, len: number) {
     return new Note({
       ch: ch,
-      start: this.getX(x),
-      note: this.getY(y),
+      start: this.getNoteX(x),
+      note: this.getNoteY(y),
       end: len
     });
   }
   hitTest(note: Note, x: number, y: number) {
     return (
-      note.start <= this.getX(x) &&
-      note.start + note.length >= this.getX(x) &&
-      this.getY(y) === note.no
+      note.start <= this.getNoteX(x) &&
+      note.start + note.length >= this.getNoteX(x) &&
+      this.getNoteY(y) === note.no
     )
   }
 }

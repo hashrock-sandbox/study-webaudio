@@ -48,14 +48,10 @@
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var pianoroll_1 = __webpack_require__(1);
 	var mml = __webpack_require__(6);
+	var download = __webpack_require__(11);
 	var mml2smf = __webpack_require__(7);
-	var el = document.querySelector(".canvas");
-	var piano = new pianoroll_1.PianoRoll({
-	    el: el,
-	    notes: []
-	});
+	var piano;
 	var playing = false;
-	var playButton = document.querySelector("#play");
 	function togglePlaying() {
 	    if (playing) {
 	        piano.stop();
@@ -66,50 +62,62 @@
 	        playing = true;
 	    }
 	}
-	playButton.addEventListener("click", function () {
-	    togglePlaying();
-	});
-	var exportSource = document.querySelector("#export-source");
-	document.querySelector("#export-json").addEventListener("click", function () {
-	    exportSource.value = JSON.stringify(piano.notes, null, 2);
-	});
-	document.querySelector("#export-mml").addEventListener("click", function () {
-	    exportSource.value = mml.jsonToMML(piano.notes).join(";\n");
-	});
-	document.querySelector("#export-smf").addEventListener("click", function () {
-	    //現在、ch1のみ。ボリューム指定は0-15を0-127に変換する必要があるが、対数にすべきか不明なのでとりあえず固定値にした
-	    var binary = mml2smf(mml.jsonToMML(piano.notes).map(function (line) { return "C1" + line; }).join(";\n").replace(/v10/g, "v80"));
-	    downloadBlob(binary, 'minroll.mid', 'application/octet-stream');
-	});
-	function downloadBlob(data, fileName, mimeType) {
-	    var blob = new Blob([data], {
-	        type: mimeType
-	    });
-	    var url = window.URL.createObjectURL(blob);
-	    downloadURL(url, fileName);
-	    setTimeout(function () {
-	        return window.URL.revokeObjectURL(url);
-	    }, 1000);
-	}
-	;
-	function downloadURL(data, fileName) {
-	    var a;
-	    a = document.createElement('a');
-	    a.href = data;
-	    a.download = fileName;
-	    document.body.appendChild(a);
-	    a.style.display = 'none';
-	    a.click();
-	    a.remove();
-	}
-	;
-	//downloadBlob(myBinaryBlob, 'some-file.bin', 'application/octet-stream');
 	document.addEventListener("keypress", function (e) {
 	    if (e.keyCode === 32) {
 	        togglePlaying();
 	    }
 	});
-	piano.draw();
+	new Vue({
+	    el: "#app",
+	    data: {
+	        source: "",
+	        isMenuVisible: false,
+	        isExportDialogVisible: false,
+	        patternLength: "32"
+	    },
+	    mounted: function () {
+	        var el = document.querySelector(".canvas");
+	        piano = new pianoroll_1.PianoRoll({
+	            el: el,
+	            notes: [],
+	            patternLength: 32
+	        });
+	        piano.draw();
+	    },
+	    watch: {
+	        "patternLength": function (value) {
+	            piano.patternLength = parseInt(value);
+	        }
+	    },
+	    methods: {
+	        exportJson: function (e) {
+	            this.hideMenu();
+	            this.isExportDialogVisible = true;
+	            this.source = JSON.stringify(piano.notes, null, 2);
+	        },
+	        exportMml: function (e) {
+	            this.hideMenu();
+	            this.isExportDialogVisible = true;
+	            this.source = mml.jsonToMML(piano.notes).join(";\n");
+	        },
+	        exportSmf: function () {
+	            //現在、ch1のみ。ボリューム指定は0-15を0-127に変換する必要があるが、対数にすべきか不明なのでとりあえず固定値にした
+	            var binary = mml2smf(mml.jsonToMML(piano.notes).map(function (line) { return "C1" + line; }).join(";\n").replace(/v10/g, "v80"));
+	            download.downloadBlob(binary, 'minroll.mid', 'application/octet-stream');
+	        },
+	        play: function () {
+	            togglePlaying();
+	        },
+	        hideMenu: function () {
+	            this.isMenuVisible = false;
+	            this.isExportDialogVisible = false;
+	        },
+	        showMenu: function () {
+	            this.isMenuVisible = true;
+	            this.isExportDialogVisible = false;
+	        }
+	    }
+	});
 
 
 /***/ },
@@ -128,12 +136,14 @@
 	        var _this = this;
 	        this.el = options.el;
 	        this.notes = options.notes ? options.notes : [];
+	        this.patternLength = options.patternLength ? options.patternLength : 32;
 	        this.drv = new canvas_1.DrawingDriver(this.el.getContext("2d"), this.el.offsetWidth, this.el.offsetHeight);
 	        this.hoverNote = null;
 	        this.clicked = false;
 	        this.nowNote = -1;
 	        this.playing = false;
 	        this.playingPos = -1;
+	        this.drv.patternLength = options.patternLength;
 	        var bpm = 120;
 	        var timebase = 60000 / bpm / 4;
 	        setInterval(function () {
@@ -179,6 +189,16 @@
 	            _this.onMouseUp(pos.x, pos.y);
 	        });
 	    }
+	    Object.defineProperty(PianoRoll.prototype, "patternLength", {
+	        set: function (value) {
+	            if (this.drv) {
+	                this.drv.patternLength = value;
+	                this.el.width = value * 32;
+	            }
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
 	    PianoRoll.prototype.onMouseDown = function (x, y) {
 	        var note = this.drv.createNote(1, x, y, 1);
 	        this.nowNote = note.no;
@@ -201,6 +221,10 @@
 	                this.nowNote = note.no;
 	            }
 	        }
+	        /*
+	        let ret = this.drv.toScreen(note)
+	        console.log(ret)
+	        */
 	        this.hoverNote = note;
 	        this.draw();
 	    };
@@ -291,7 +315,8 @@
 	    function DrawingDriver(ctx, w, h) {
 	        this.w = w;
 	        this.h = h;
-	        this.noteWidth = this.w / PATTERN_LENGTH;
+	        //    this.noteWidth = this.w / PATTERN_LENGTH;
+	        this.noteWidth = 32;
 	        this.noteHeight = this.h / NOTE_RANGE;
 	        this.ctx = ctx;
 	        this.scale = NoteScale(this.noteWidth, this.noteHeight);
@@ -300,15 +325,32 @@
 	        this.ctx.fillStyle = color;
 	        this.ctx.fillRect(x, y, w, h);
 	    };
+	    Object.defineProperty(DrawingDriver.prototype, "patternLength", {
+	        set: function (value) {
+	            this._patternLength = value;
+	            this.w = value * 32;
+	            this.clear();
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
 	    DrawingDriver.prototype.drawNote = function (note, color) {
 	        var t = this.scale(note.start, note.no, note.length, 1);
 	        this._drawRect(t.x, this.h - t.y - t.h, t.w, t.h, color);
 	    };
-	    DrawingDriver.prototype.getY = function (y) {
+	    DrawingDriver.prototype.getNoteY = function (y) {
 	        return Math.floor((this.h - y) / this.noteHeight);
 	    };
-	    DrawingDriver.prototype.getX = function (x) {
+	    DrawingDriver.prototype.getNoteX = function (x) {
 	        return Math.floor(x / this.noteWidth);
+	    };
+	    DrawingDriver.prototype.toScreen = function (n) {
+	        return {
+	            x: n.start * this.noteWidth,
+	            y: this.h - (n.no + 1) * this.noteHeight,
+	            h: this.noteHeight,
+	            w: this.noteWidth
+	        };
 	    };
 	    DrawingDriver.prototype.drawKeyboard = function () {
 	        this.ctx.fillStyle = "#BBBBBB";
@@ -326,10 +368,17 @@
 	        this.ctx.save();
 	        this.ctx.lineWidth = 1;
 	        this.ctx.strokeStyle = "#AAAAAA";
-	        this.ctx.beginPath();
-	        for (var i = 0; i < PATTERN_LENGTH; i++) {
+	        for (var i = 0; i < this._patternLength; i++) {
+	            this.ctx.beginPath();
+	            if (i % 4 === 0) {
+	                this.ctx.strokeStyle = "#777777";
+	            }
+	            else {
+	                this.ctx.strokeStyle = "#AAAAAA";
+	            }
 	            this.ctx.moveTo(i * this.noteWidth, 0);
 	            this.ctx.lineTo(i * this.noteWidth, this.h);
+	            this.ctx.stroke();
 	        }
 	        for (var i = 0; i < NOTE_RANGE; i++) {
 	            this.ctx.moveTo(0, i * this.noteHeight);
@@ -352,22 +401,22 @@
 	        return new note_1.Note({
 	            ch: ch,
 	            start: x,
-	            note: this.getY(y),
-	            end: this.getX(x1) - x + 1
+	            note: this.getNoteY(y),
+	            end: this.getNoteX(x1) - x + 1
 	        });
 	    };
 	    DrawingDriver.prototype.createNote = function (ch, x, y, len) {
 	        return new note_1.Note({
 	            ch: ch,
-	            start: this.getX(x),
-	            note: this.getY(y),
+	            start: this.getNoteX(x),
+	            note: this.getNoteY(y),
 	            end: len
 	        });
 	    };
 	    DrawingDriver.prototype.hitTest = function (note, x, y) {
-	        return (note.start <= this.getX(x) &&
-	            note.start + note.length >= this.getX(x) &&
-	            this.getY(y) === note.no);
+	        return (note.start <= this.getNoteX(x) &&
+	            note.start + note.length >= this.getNoteX(x) &&
+	            this.getNoteY(y) === note.no);
 	    };
 	    return DrawingDriver;
 	}());
@@ -3055,6 +3104,40 @@
 	    parse:       parse
 	  };
 	})();
+
+
+/***/ },
+/* 9 */,
+/* 10 */,
+/* 11 */
+/***/ function(module, exports) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	function downloadBlob(data, fileName, mimeType) {
+	    var blob = new Blob([data], {
+	        type: mimeType
+	    });
+	    var url = window.URL.createObjectURL(blob);
+	    downloadURL(url, fileName);
+	    setTimeout(function () {
+	        return window.URL.revokeObjectURL(url);
+	    }, 1000);
+	}
+	exports.downloadBlob = downloadBlob;
+	;
+	function downloadURL(data, fileName) {
+	    var a;
+	    a = document.createElement('a');
+	    a.href = data;
+	    a.download = fileName;
+	    document.body.appendChild(a);
+	    a.style.display = 'none';
+	    a.click();
+	    a.remove();
+	}
+	exports.downloadURL = downloadURL;
+	;
 
 
 /***/ }
