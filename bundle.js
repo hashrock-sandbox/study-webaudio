@@ -42,13 +42,13 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var pianoroll_1 = __webpack_require__(1);
-	var mml = __webpack_require__(6);
-	var download = __webpack_require__(11);
+	var mml = __webpack_require__(5);
+	var download = __webpack_require__(6);
 	var mml2smf = __webpack_require__(7);
 	var piano;
 	var playing = false;
@@ -120,9 +120,9 @@
 	});
 
 
-/***/ },
+/***/ }),
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
@@ -292,9 +292,9 @@
 	}
 
 
-/***/ },
+/***/ }),
 /* 2 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
@@ -423,9 +423,9 @@
 	exports.DrawingDriver = DrawingDriver;
 
 
-/***/ },
+/***/ }),
 /* 3 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
@@ -441,15 +441,35 @@
 	exports.Note = Note;
 
 
-/***/ },
+/***/ }),
 /* 4 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var audioContext = new AudioContext();
-	var util = __webpack_require__(5);
+	MIDI.loadPlugin({
+	    instrument: "electric_piano_1",
+	    onsuccess: function () {
+	        MIDI.setEffects([
+	            {
+	                type: "Tremolo",
+	                intensity: 0.9,
+	                rate: 4,
+	                stereoPhase: 90,
+	                bypass: 0
+	            }
+	        ]);
+	        MIDI.programChange(0, 4, 0);
+	        MIDI.setVolume(0, 127);
+	    }
+	});
 	function playNote(noteNumber, length) {
+	    MIDI.noteOn(0, noteNumber, 100, 0);
+	    setTimeout(function () {
+	        MIDI.noteOff(0, noteNumber, 0);
+	    }, length);
+	    /*
 	    var osc1 = audioContext.createOscillator();
 	    var amp = audioContext.createGain();
 	    var release = 0.05;
@@ -459,31 +479,20 @@
 	    osc1.start();
 	    amp.connect(audioContext.destination);
 	    setTimeout(function () {
-	        var now = audioContext.currentTime;
-	        amp.gain.setValueAtTime(amp.gain.value, now);
-	        amp.gain.linearRampToValueAtTime(0, now + release);
-	        //osc1.disconnect();
-	        osc1.stop(now + release);
+	      var now = audioContext.currentTime;
+	      amp.gain.setValueAtTime(amp.gain.value, now);
+	      amp.gain.linearRampToValueAtTime(0, now + release);
+	      //osc1.disconnect();
+	      osc1.stop(now + release);
 	    }, length);
+	    */
 	}
 	exports.playNote = playNote;
 
 
-/***/ },
+/***/ }),
 /* 5 */
-/***/ function(module, exports) {
-
-	"use strict";
-	Object.defineProperty(exports, "__esModule", { value: true });
-	function mtof(noteNumber) {
-	    return 440 * Math.pow(2, (noteNumber - 69) / 12);
-	}
-	exports.mtof = mtof;
-
-
-/***/ },
-/* 6 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
@@ -576,9 +585,41 @@
 	exports.jsonToMML = jsonToMML;
 
 
-/***/ },
+/***/ }),
+/* 6 */
+/***/ (function(module, exports) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	function downloadBlob(data, fileName, mimeType) {
+	    var blob = new Blob([data], {
+	        type: mimeType
+	    });
+	    var url = window.URL.createObjectURL(blob);
+	    downloadURL(url, fileName);
+	    setTimeout(function () {
+	        return window.URL.revokeObjectURL(url);
+	    }, 1000);
+	}
+	exports.downloadBlob = downloadBlob;
+	;
+	function downloadURL(data, fileName) {
+	    var a;
+	    a = document.createElement('a');
+	    a.href = data;
+	    a.download = fileName;
+	    document.body.appendChild(a);
+	    a.style.display = 'none';
+	    a.click();
+	    a.remove();
+	}
+	exports.downloadURL = downloadURL;
+	;
+
+
+/***/ }),
 /* 7 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -859,9 +900,9 @@
 
 	module.exports = exports["default"];
 
-/***/ },
+/***/ }),
 /* 8 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	module.exports = (function() {
 	  /*
@@ -3106,39 +3147,5 @@
 	})();
 
 
-/***/ },
-/* 9 */,
-/* 10 */,
-/* 11 */
-/***/ function(module, exports) {
-
-	"use strict";
-	Object.defineProperty(exports, "__esModule", { value: true });
-	function downloadBlob(data, fileName, mimeType) {
-	    var blob = new Blob([data], {
-	        type: mimeType
-	    });
-	    var url = window.URL.createObjectURL(blob);
-	    downloadURL(url, fileName);
-	    setTimeout(function () {
-	        return window.URL.revokeObjectURL(url);
-	    }, 1000);
-	}
-	exports.downloadBlob = downloadBlob;
-	;
-	function downloadURL(data, fileName) {
-	    var a;
-	    a = document.createElement('a');
-	    a.href = data;
-	    a.download = fileName;
-	    document.body.appendChild(a);
-	    a.style.display = 'none';
-	    a.click();
-	    a.remove();
-	}
-	exports.downloadURL = downloadURL;
-	;
-
-
-/***/ }
+/***/ })
 /******/ ]);
