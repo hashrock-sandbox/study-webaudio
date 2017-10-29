@@ -1,6 +1,6 @@
 import { DrawingDriver } from "./canvas"
-import { Note } from "./note"
-import * as audio from "./audio"
+import { Note } from "../model/note"
+import * as audio from "../model/audio"
 
 interface NoteEvent {
   noteNumber: number;

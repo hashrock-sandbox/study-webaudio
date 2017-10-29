@@ -42,14 +42,13 @@
 </template>
 
 <script lang="ts">
-/// <reference path="./mml2smf.d.ts" />
+/// <reference path="../types/mml2smf.d.ts" />
 
-//import Vue from 'vue'
 import { PianoRoll } from "./pianoroll";
 var piano: PianoRoll;
-import * as mml from "./mml";
+import * as mml from "../model/mml";
 import * as mml2smf from "mml2smf";
-import * as download from "./download";
+import * as download from "../model/download";
 
 let playing = false;
 

@@ -1,4 +1,4 @@
-import {Note} from "./note"
+import {Note} from "../model/note"
 
 const PATTERN_LENGTH = 32;
 const NOTE_RANGE = 48;

@@ -1,5 +1,5 @@
-import { Note } from "./note"
-import * as mml from "./mml"
+import { Note } from "./model/note"
+import * as mml from "./model/mml"
 
 let cmajor = [
   {

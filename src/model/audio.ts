@@ -1,5 +1,5 @@
 var audioContext = new AudioContext();
-import * as util from "./util"
+import * as util from "../util/util"
 declare const MIDI:any
 
 MIDI.loadPlugin({
