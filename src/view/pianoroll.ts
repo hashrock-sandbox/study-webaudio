@@ -18,7 +18,7 @@ interface PianoRollOptions {
 
 export class PianoRoll {
   el: HTMLCanvasElement;
-  notes: Note[];
+  _notes: Note[];
   drv: DrawingDriver;
   hoverNote: Note | null;
   clicked: boolean;
@@ -46,17 +46,23 @@ export class PianoRoll {
     }
   }
 
+  set notes(notes){
+    this._notes = notes;
+    this.drv = new DrawingDriver(this.el.getContext("2d"), this.el.offsetWidth, this.el.offsetHeight);
+  }
+  get notes(){
+    return this._notes;
+  }
+
   constructor(options: PianoRollOptions) {
     this.el = options.el;
     this.notes = options.notes ? options.notes : [];
     this.patternLength = options.patternLength ? options.patternLength : 32;
-    this.drv = new DrawingDriver(this.el.getContext("2d"), this.el.offsetWidth, this.el.offsetHeight);
     this.hoverNote = null;
     this.clicked = false;
     this.nowNote = -1;
     this.playing = false;
     this.playingPos = -1;
-    this.drv.patternLength = options.patternLength
     this.bpm = 120;
     let timebase = 60000 / this.bpm / 4;
 
