@@ -32,7 +32,7 @@ export class PianoRoll {
     if (this.playing) {
       this.playingPos++;
       this.drv.playPosition = this.playingPos
-      if (this.playingPos > this.drv.patternLength) {
+      if (this.playingPos >= this.drv.patternLength) {
         this.playingPos = 0;
       }
       this.notes.forEach((note) => {
