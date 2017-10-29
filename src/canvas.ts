@@ -50,6 +50,9 @@ export class DrawingDriver {
     this.w = value * 32
     this.clear()
   }
+  get patternLength(){
+    return this._patternLength
+  }
 
   drawNote(note: Note, color: string) {
     var t = this.scale(note.start, note.no, note.length, 1);

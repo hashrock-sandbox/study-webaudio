@@ -91,7 +91,9 @@ export default {
   },
   watch: {
     patternLength: function(value: string) {
+      console.log(value)
       piano.patternLength = parseInt(value);
+      console.log("piano.patternLength", piano.patternLength)
     }
   },
   methods: {

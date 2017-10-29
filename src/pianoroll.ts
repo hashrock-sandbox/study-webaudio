@@ -26,6 +26,25 @@ export class PianoRoll {
   startPos: number;
   playing: boolean;
   playingPos: number;
+  bpm: number;
+
+  tick() {
+    if (this.playing) {
+      this.playingPos++;
+      this.drv.playPosition = this.playingPos
+      if (this.playingPos > this.drv.patternLength) {
+        this.playingPos = 0;
+      }
+      this.notes.forEach((note) => {
+        if (note.start === this.playingPos) {
+          playNote({
+            noteNumber: note.no + 48
+          }, note.length * 60000 / this.bpm / 4)
+        }
+      })
+      this.draw()
+    }
+  }
 
   constructor(options: PianoRollOptions) {
     this.el = options.el;
@@ -38,26 +57,11 @@ export class PianoRoll {
     this.playing = false;
     this.playingPos = -1;
     this.drv.patternLength = options.patternLength
-
-    let bpm = 120
-    let timebase = 60000 / bpm / 4;
+    this.bpm = 120;
+    let timebase = 60000 / this.bpm / 4;
 
     setInterval(() => {
-      if (this.playing) {
-        this.playingPos++;
-        this.drv.playPosition = this.playingPos
-        if (this.playingPos > 32) {
-          this.playingPos = 0;
-        }
-        this.notes.forEach((note) => {
-          if (note.start === this.playingPos) {
-            playNote({
-              noteNumber: note.no + 48
-            }, note.length * 60000 / bpm / 4)
-          }
-        })
-        this.draw()
-      }
+      this.tick();
     }, timebase)
 
     this.el.addEventListener("mousemove", (e: MouseEvent) => {
@@ -90,10 +94,11 @@ export class PianoRoll {
     })
   }
 
-  set patternLength(value: number){
-    if(this.drv){
+  set patternLength(value: number) {
+    if (this.drv) {
       this.drv.patternLength = value
       this.el.width = value * 32
+      this.playingPos = 0;
     }
   }
 
