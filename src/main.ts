@@ -1,13 +1,8 @@
-declare var require:any
-declare var Vue:any
-
 import {PianoRoll} from "./pianoroll"
 import * as mml from "./mml"
 import * as download from "./download"
-const mml2smf = require("mml2smf")
-
-
-
+import * as mml2smf from "mml2smf"
+import Vue from 'vue'
 var piano: PianoRoll
 
 let playing = false;
