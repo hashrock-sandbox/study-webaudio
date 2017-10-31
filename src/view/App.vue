@@ -19,24 +19,40 @@
       minroll
     </div>
 
+    <div class="menu__inactive" v-if="user">
+      Hello, {{user.displayName}}
+    </div>
+    <div class="menu__open" v-if="user" @click="logout">
+      Logout
+    </div>
+    <div class="menu__open" v-if="!user" @click="login">
+      Login with Twitter
+    </div>
     <div class="menu__open" @click="showMenu">
       Menu
     </div>
     </nav>
     <div class="editor">
-    <div>
-      <canvas class="canvas" width="1024" height="600"></canvas>
-    </div>
-    <div class="bottom-nav">
-      <button @click="play" class="button is-small">Play / Stop</button>
-    </div>
+      <div class="editor__left">
+        <div>Test</div>
+        <div>Test</div>
+        <div>Test</div>
+        <div>Test</div>
 
-    Length: <select v-model="patternLength">
-      <option value="16">16</option>
-      <option value="32">32</option>
-      <option value="64">64</option>
-      <option value="128">128</option>
-    </select>
+      </div>
+      <div class="editor__right">
+        <div class="menu__inline">
+          <button style="line-height: 2rem;" @click="play" class="button is-small">Play / Stop</button>
+          <select style="height: 2rem;" v-model="patternLength">
+            <option value="16">16</option>
+            <option value="32">32</option>
+            <option value="64">64</option>
+            <option value="128">128</option>
+          </select>          
+        </div>
+        <canvas class="canvas" width="1024" height="600"></canvas>
+      </div>
+
     </div>
     <div class="experimental">
       <h1>実験中機能</h1>
@@ -303,7 +319,14 @@ nav.menu {
 }
 
 .editor {
-  margin: 1rem;
+  display: flex;
+}
+
+.editor__left{
+  width: 15rem;  
+}
+.editor__right{
+  
 }
 
 .export-dialog {

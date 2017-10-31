@@ -5,7 +5,7 @@ module.exports = {
   entry: './src/main.ts',
   output: {
     path: path.resolve(__dirname, './public/dist'),
-    publicPath: '/public/dist/',
+    publicPath: "dist",
     filename: 'build.js'
   },
   module: {
@@ -41,6 +41,7 @@ module.exports = {
     }
   },
   devServer: {
+    contentBase: path.resolve(__dirname, 'public'),    
     historyApiFallback: true,
     noInfo: true,
     overlay: true
