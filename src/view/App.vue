@@ -35,7 +35,7 @@
     <div class="editor">
       <div class="editor__left">
         <div v-if="user" class="editor__save" @click="save">SAVE</div>
-        <div class="item" v-for="(post, index) in posts" :key="post.key"  @click="load(post)">
+        <div class="item" v-for="(post, index) in postsRev" :key="post.key"  @click="load(post)">
           {{post.val().author.full_name}} {{post.val().timestamp | ymd}}
         </div>
 
@@ -99,6 +99,11 @@ export default {
       user: {},
       posts: []
     };
+  },
+  computed: {
+    postsRev(){
+      return this.posts.reverse()
+    }
   },
   filters:{
     ymd(input){
