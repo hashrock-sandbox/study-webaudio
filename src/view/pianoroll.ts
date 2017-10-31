@@ -49,6 +49,7 @@ export class PianoRoll {
   set notes(notes){
     this._notes = notes;
     this.drv = new DrawingDriver(this.el.getContext("2d"), this.el.offsetWidth, this.el.offsetHeight);
+    this.draw()
   }
   get notes(){
     return this._notes;
@@ -105,6 +106,7 @@ export class PianoRoll {
       this.drv.patternLength = value
       this.el.width = value * 32
       this.playingPos = 0;
+      this.draw()
     }
   }
 
