@@ -36,7 +36,7 @@
       <div class="editor__left">
         <div v-if="user" class="editor__save" @click="save">SAVE</div>
         <div class="item" v-for="(post, index) in postsRev" :key="post.key"  @click="load(post)">
-          {{post.val().author.full_name}} {{post.val().timestamp | ymd}}
+          {{post.val().author.full_name}} {{post.val().timestamp | ymd}} <span @click="remove(post)">×</span>
         </div>
 
 
@@ -201,12 +201,12 @@ export default {
       };
       this.ref.push(item).then(()=>{
         console.log("Done")
-        /*
-        this.message = "";
-        var t:HTMLTextAreaElement = <HTMLTextAreaElement>document.querySelector(".message");
-        t.focus();
-        */
       })
+    },
+    remove(post: FirebaseItem){
+      this.ref.child(post.key).remove();
+      window.location.reload();
+
     },
     load(post: FirebaseItem){
       var p = post.val()
