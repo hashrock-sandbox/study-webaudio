@@ -34,10 +34,11 @@
     </nav>
     <div class="editor">
       <div class="editor__left">
-        <div>Test</div>
-        <div>Test</div>
-        <div>Test</div>
-        <div>Test</div>
+        <div v-if="user" class="editor__save" @click="save">SAVE</div>
+        <div class="item" v-for="(post, index) in posts" :key="post.key"  @click="load(post)">
+          {{post.val().author.full_name}} {{post.val().timestamp | ymd}}
+        </div>
+
 
       </div>
       <div class="editor__right">
@@ -53,19 +54,6 @@
         <canvas class="canvas" width="1024" height="600"></canvas>
       </div>
 
-    </div>
-    <div class="experimental">
-      <h1>実験中機能</h1>
-      <div class="header__login" v-if="user">
-        {{user.displayName}}<button @click="logout">logout</button>
-        <div>
-          <button @click="save">SAVE</button>
-        </div>
-      </div>
-      <button v-if="!user" @click="login">login</button>
-      <div class="item" v-for="(post, index) in posts" :key="post.key"  @click="load(post)">
-        * {{post.key}} - {{post.val().author.full_name}} - {{new Date(post.val().timestamp)}}
-      </div>
     </div>
 
   </div>
@@ -111,6 +99,12 @@ export default {
       user: {},
       posts: []
     };
+  },
+  filters:{
+    ymd(input){
+      var d = new Date(input)
+      return `${d.getMonth()+1}/${d.getDate()} ${("00" + d.getHours()).slice(-2)}:${("00"+ d.getMinutes()).slice(-2)}`
+    }
   },
   mounted() {
     var config = {
@@ -248,9 +242,6 @@ export class FirebaseUser{
 #app {
   position: relative;
 }
-.item{
-  cursor: pointer;
-}
 
 
 .fade {
@@ -323,7 +314,8 @@ nav.menu {
 }
 
 .editor__left{
-  width: 15rem;  
+  width: 15rem; 
+  min-width: 15rem;
 }
 .editor__right{
   
@@ -346,5 +338,31 @@ textarea {
 .experimental{
   margin: 2rem;
   background: #666;
+}
+
+.editor__save {
+    /* line-height: 2rem; */
+    border: 1px solid white;
+    margin: 0.4rem;
+    padding: 0.5rem;
+    border-radius: 0.2rem;
+    text-align: center;
+    cursor: pointer;
+}
+.editor__save:hover {
+  background: #666;
+}
+
+.item{
+  cursor: pointer;
+  padding: 0 0.5rem;
+}
+
+.item:hover {
+  background: #666;
+}
+
+.menu__inactive{
+  padding: 0 1rem;
 }
 </style>
