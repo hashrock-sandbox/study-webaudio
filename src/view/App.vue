@@ -21,7 +21,7 @@
     <div class="editor">
       <div class="editor__left">
         <div v-if="user" class="editor__save" @click="save">SAVE</div>
-        <div class="item" v-for="(post, index) in postsRev" :key="post.key"  @click="load(post)">
+        <div class="item" v-for="(post) in postsRev" :key="post.key"  @click="load(post)">
           {{post.val().author.full_name}} {{post.val().timestamp | ymd}} <span @click="remove(post)">×</span>
         </div>
 
@@ -47,7 +47,7 @@
 
 <script lang="ts">
 
-import { PianoRoll } from "./pianoroll";
+import { PianoRoll } from "./canvas";
 var piano: PianoRoll;
 import * as firebase from "firebase"
 
