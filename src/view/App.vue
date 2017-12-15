@@ -41,7 +41,6 @@
       </div>
 
     </div>
-
   </div>
 </template>
 
@@ -79,7 +78,7 @@ export default {
       isExportDialogVisible: false,
       patternLength: "32",
       user: {},
-      posts: []
+      posts: [] as FirebaseItem[]
     };
   },
   computed: {

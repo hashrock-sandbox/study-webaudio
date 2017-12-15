@@ -66,7 +66,7 @@ export class PianoRoll {
 
   set notes(notes) {
     this._notes = notes;
-    this.drv = new DrawingDriver(this.el.getContext("2d"), this.el.offsetWidth, this.el.offsetHeight);
+    this.drv = new DrawingDriver(<CanvasRenderingContext2D>this.el.getContext("2d"), this.el.offsetWidth, this.el.offsetHeight);
     this.draw()
   }
   get notes() {
@@ -180,7 +180,7 @@ export class PianoRoll {
   }
 
   _drawHoverNote() {
-    this.drv.drawNote(this.hoverNote, "rgba(255,255,255,0.5)");
+    this.drv.drawNote(<Note>this.hoverNote, "rgba(255,255,255,0.5)");
   }
 
   draw() {

@@ -1,27 +1,16 @@
+import Instruments from 'webaudio-instruments'
+var player = new Instruments()
+
 var audioContext = new AudioContext();
-declare const MIDI:any
-
-MIDI.loadPlugin({
-  instrument: "electric_piano_1",
-  onsuccess: function () {
-    MIDI.setEffects([
-      {
-        type: "Tremolo",
-        intensity: 0.9,    //0 to 1
-        rate: 4,         //0.001 to 8
-        stereoPhase: 90,    //0 to 180
-        bypass: 0
-      }
-    ]);
-
-    MIDI.programChange(0, 4, 0)
-    MIDI.setVolume(0, 127);
-  }
-});
 
 export function playNote(noteNumber: number, length: number) {
-  MIDI.noteOn(0, noteNumber, 100, 0);
-  setTimeout(function () {
-    MIDI.noteOff(0, noteNumber, 0);
-  }, length);
+  player.play(
+    24,        // instrument: 24 is "Acoustic Guitar (nylon)" 
+    noteNumber,        // note: midi number or frequency in Hz (if > 127) 
+    0.5,       // velocity: 0..1 
+    0,         // delay in seconds 
+    length / 1000,       // duration in seconds 
+    0,         // (optional - specify channel for tinysynth to use) 
+    0.05       // (optional - override envelope "attack" parameter) 
+  )
 }

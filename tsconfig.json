@@ -1,11 +1,8 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "sourceMap": true,
-    "noImplicitAny": false,
-    "allowJs": true
-  },
-  "exclude": [
-    "node_modules"
-  ]
+    "module": "es2015",
+    "moduleResolution": "node",
+    "experimentalDecorators": true
+  }
 }
