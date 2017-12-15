@@ -1,28 +1,25 @@
 <template>
-  <div id="main">
-    <piano-roll></piano-roll>
-  </div>
+  <svg :width="width" :height="height">
+
+  </svg>
 </template>
 <script lang="ts">
 import Vue from "vue";
-import PianoRoll from "./PianoRoll.vue"
 export default Vue.extend({
   data(){
     return {
-      text: "Hello There"
+      text: "Hello There",
+      width: 300,
+      height: 300
     }
   },
   mounted() {
     console.log(this.text)
-  },
-  components: {
-    PianoRoll
   }
 })
 </script>
-
 <style>
-body{
-  background: gray;
+svg{
+  background: white;
 }
 </style>
