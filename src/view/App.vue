@@ -1,19 +1,5 @@
 <template>
   <div id="#app">
-    <div class="fade" v-if="isMenuVisible || isExportDialogVisible" @click="hideMenu">
-    <div class="rightmenu" v-if="isMenuVisible">
-      <div class="rightmenu__item" @click.stop="exportJson">Export to JSON</div>
-      <div class="rightmenu__item" @click.stop="exportMml">Export to MML</div>
-      <div class="rightmenu__item" @click="exportSmf">Export to MIDI File</div>
-    </div>
-
-    <div class="export-dialog" v-if="isExportDialogVisible" @click.stop>
-      <textarea v-model="source"></textarea>
-      <a href="http://d.hatena.ne.jp/aike/20160822">TSS Ctrl-C MML Player</a> 互換のMMLを出力します。
-    </div>
-    </div>
-
-
     <nav class="menu">
     <div class="menu__logo">
       minroll
@@ -60,13 +46,9 @@
 </template>
 
 <script lang="ts">
-/// <reference path="../types/mml2smf.d.ts" />
 
 import { PianoRoll } from "./pianoroll";
 var piano: PianoRoll;
-import * as mml from "../model/mml";
-import * as mml2smf from "mml2smf";
-import * as download from "../model/download";
 import * as firebase from "firebase"
 
 let playing = false;
@@ -150,27 +132,6 @@ export default {
     }
   },
   methods: {
-    exportJson(e: MouseEvent) {
-      this.hideMenu();
-      this.isExportDialogVisible = true;
-      this.source = JSON.stringify(piano.notes, null, 2);
-    },
-    exportMml(e: MouseEvent) {
-      this.hideMenu();
-      this.isExportDialogVisible = true;
-      this.source = mml.jsonToMML(piano.notes).join(";\n");
-    },
-    exportSmf() {
-      //現在、ch1のみ。ボリューム指定は0-15を0-127に変換する必要があるが、対数にすべきか不明なのでとりあえず固定値にした
-      let binary = mml2smf(
-        mml
-          .jsonToMML(piano.notes)
-          .map(line => "C1" + line)
-          .join(";\n")
-          .replace(/v10/g, "v80")
-      );
-      download.downloadBlob(binary, "minroll.mid", "application/octet-stream");
-    },
     play() {
       togglePlaying();
     },
