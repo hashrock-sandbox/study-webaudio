@@ -1,7 +1,7 @@
 import { Note } from "../model/note";
 
 const PATTERN_LENGTH = 32;
-const NOTE_RANGE = 48;
+const NOTE_RANGE = 12 * 5;
 
 interface NoteScaleData {
   x: number;
@@ -77,7 +77,7 @@ export class DrawingDriver {
   }
 
   drawKeyboard() {
-    this.ctx.fillStyle = "#BBBBBB";
+    this.ctx.fillStyle = "#DDDDDD";
     for (let i = 0; i < NOTE_RANGE; i++) {
       if (
         i % 12 === 1 ||
@@ -99,18 +99,19 @@ export class DrawingDriver {
   drawGridLines() {
     this.ctx.save();
     this.ctx.lineWidth = 1;
-    this.ctx.strokeStyle = "#AAAAAA";
+    this.ctx.strokeStyle = "#BBBBBB";
     for (let i = 0; i < this._patternLength; i++) {
       this.ctx.beginPath();
       if (i % 4 === 0) {
         this.ctx.strokeStyle = "#777777";
       } else {
-        this.ctx.strokeStyle = "#AAAAAA";
+        this.ctx.strokeStyle = "#BBBBBB";
       }
       this.ctx.moveTo(i * this.noteWidth, 0);
       this.ctx.lineTo(i * this.noteWidth, this.h);
       this.ctx.stroke();
     }
+    this.ctx.strokeStyle = "#DDDDDD";
     for (let i = 0; i < NOTE_RANGE; i++) {
       this.ctx.moveTo(0, i * this.noteHeight);
       this.ctx.lineTo(this.w, i * this.noteHeight);

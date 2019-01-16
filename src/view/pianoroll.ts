@@ -78,33 +78,18 @@ export class PianoRoll {
       this.tick();
     }, timebase);
 
-    this.el.addEventListener("mousemove", (e: MouseEvent) => {
+    this.el.addEventListener("pointermove", (e: PointerEvent) => {
       this.onMouseMove(e.offsetX, e.offsetY);
     });
 
-    this.el.addEventListener("mousedown", e => {
+    this.el.addEventListener("pointerdown", (e: PointerEvent) => {
       e.preventDefault();
       this.onMouseDown(e.offsetX, e.offsetY);
     });
 
-    this.el.addEventListener("mouseup", (e: MouseEvent) => {
+    this.el.addEventListener("pointerup", (e: PointerEvent) => {
       e.preventDefault();
       this.onMouseUp(e.offsetX, e.offsetY);
-    });
-
-    this.el.addEventListener("touchmove", e => {
-      let pos = convertTouchEvent(e);
-      this.onMouseMove(pos.x, pos.y);
-    });
-    this.el.addEventListener("touchstart", e => {
-      e.preventDefault();
-      let pos = convertTouchEvent(e);
-      this.onMouseDown(pos.x, pos.y);
-    });
-    this.el.addEventListener("touchend", e => {
-      e.preventDefault();
-      let pos = convertTouchEvent(e);
-      this.onMouseUp(pos.x, pos.y);
     });
   }
 
@@ -147,10 +132,6 @@ export class PianoRoll {
         this.nowNote = note.no;
       }
     }
-    /*
-    let ret = this.drv.toScreen(note)
-    console.log(ret)
-    */
     this.hoverNote = note;
     this.draw();
   }
@@ -169,12 +150,12 @@ export class PianoRoll {
 
   _drawAllNotes() {
     this.notes.forEach((note: Note) => {
-      this.drv.drawNote(note, "#FFF");
+      this.drv.drawNote(note, "#d66");
     });
   }
 
   _drawHoverNote() {
-    this.drv.drawNote(this.hoverNote, "rgba(255,255,255,0.5)");
+    this.drv.drawNote(this.hoverNote, "rgba(0,0,0,0.5)");
   }
 
   draw() {
@@ -210,15 +191,4 @@ function _isHit(n: Note, note: Note) {
     n.start <= note.start &&
     n.start + n.length - 1 >= note.start
   );
-}
-
-function convertTouchEvent(e: TouchEvent) {
-  var dom = <HTMLElement>e.target;
-  var rect = dom.getBoundingClientRect();
-  var x = e.targetTouches[0].pageX - rect.left;
-  var y = e.targetTouches[0].pageY - rect.top;
-  return {
-    x: x,
-    y: y
-  };
 }

@@ -19,7 +19,7 @@
       <div class="menu__inactive" v-if="user">Hello, {{user.displayName}}</div>
       <div class="menu__open" v-if="user" @click="logout">Logout</div>
       <div class="menu__open" v-if="!user" @click="login">Login with Twitter</div>
-      <div class="menu__open" @click="showMenu">Menu</div>
+      <div class="menu__open" @click="showMenu">Export</div>
     </nav>
     <div class="editor">
       <div class="editor__left">
@@ -32,6 +32,8 @@
         </div>
       </div>
       <div class="editor__right">
+        <canvas class="canvas" width="1024" height="600"></canvas>
+
         <div class="menu__inline">
           <button style="line-height: 2rem;" @click="play" class="button is-small">Play / Stop</button>
           <select style="height: 2rem;" v-model="patternLength">
@@ -41,7 +43,6 @@
             <option value="128">128</option>
           </select>
         </div>
-        <canvas class="canvas" width="1024" height="600"></canvas>
       </div>
     </div>
   </div>
@@ -262,7 +263,7 @@ export class FirebaseUser {
 }
 
 canvas {
-  background: #ccc;
+  background: #ffffff;
 }
 
 body {
@@ -347,6 +348,9 @@ textarea {
 .item {
   cursor: pointer;
   padding: 0 0.5rem;
+  line-height: 2rem;
+  font-size: 0.75rem;
+  border-bottom: 1px solid #666;
 }
 
 .item:hover {
@@ -355,5 +359,8 @@ textarea {
 
 .menu__inactive {
   padding: 0 1rem;
+}
+.menu__inline {
+  padding: 0.5rem;
 }
 </style>
