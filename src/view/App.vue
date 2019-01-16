@@ -60,7 +60,6 @@
 </template>
 
 <script lang="ts">
-/// <reference path="../types/mml2smf.d.ts" />
 
 import { PianoRoll } from "./pianoroll";
 var piano: PianoRoll;
