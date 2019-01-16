@@ -150,7 +150,7 @@ export default {
     },
     exportSmf() {
       //現在、ch1のみ。ボリューム指定は0-15を0-127に変換する必要があるが、対数にすべきか不明なのでとりあえず固定値にした
-      let binary = mml2smf(
+      let binary = mml2smf.default(
         mml
           .jsonToMML(piano.notes)
           .map(line => "C1" + line)
@@ -323,7 +323,6 @@ nav.menu {
 
 textarea {
   font-size: 15px;
-  flex: 1;
   height: 300px;
 }
 
