@@ -1,45 +1,35 @@
 <template>
   <div id="#app">
     <div class="fade" v-if="isMenuVisible || isExportDialogVisible" @click="hideMenu">
-    <div class="rightmenu" v-if="isMenuVisible">
-      <div class="rightmenu__item" @click.stop="exportJson">Export to JSON</div>
-      <div class="rightmenu__item" @click.stop="exportMml">Export to MML</div>
-      <div class="rightmenu__item" @click="exportSmf">Export to MIDI File</div>
-    </div>
+      <div class="rightmenu" v-if="isMenuVisible">
+        <div class="rightmenu__item" @click.stop="exportJson">Export to JSON</div>
+        <div class="rightmenu__item" @click.stop="exportMml">Export to MML</div>
+        <div class="rightmenu__item" @click="exportSmf">Export to MIDI File</div>
+      </div>
 
-    <div class="export-dialog" v-if="isExportDialogVisible" @click.stop>
-      <textarea v-model="source"></textarea>
-      <a href="http://d.hatena.ne.jp/aike/20160822">TSS Ctrl-C MML Player</a> 互換のMMLを出力します。
+      <div class="export-dialog" v-if="isExportDialogVisible" @click.stop>
+        <textarea v-model="source"></textarea>
+        <a href="http://d.hatena.ne.jp/aike/20160822">TSS Ctrl-C MML Player</a> 互換のMMLを出力します。
+      </div>
     </div>
-    </div>
-
 
     <nav class="menu">
-    <div class="menu__logo">
-      minroll
-    </div>
+      <div class="menu__logo">minroll</div>
 
-    <div class="menu__inactive" v-if="user">
-      Hello, {{user.displayName}}
-    </div>
-    <div class="menu__open" v-if="user" @click="logout">
-      Logout
-    </div>
-    <div class="menu__open" v-if="!user" @click="login">
-      Login with Twitter
-    </div>
-    <div class="menu__open" @click="showMenu">
-      Menu
-    </div>
+      <div class="menu__inactive" v-if="user">Hello, {{user.displayName}}</div>
+      <div class="menu__open" v-if="user" @click="logout">Logout</div>
+      <div class="menu__open" v-if="!user" @click="login">Login with Twitter</div>
+      <div class="menu__open" @click="showMenu">Menu</div>
     </nav>
     <div class="editor">
       <div class="editor__left">
         <div v-if="user" class="editor__save" @click="save">SAVE</div>
-        <div class="item" v-for="(post, index) in postsRev" :key="post.key"  @click="load(post)">
-          {{post.val().author.full_name}} {{post.val().timestamp | ymd}} <span @click="remove(post)">×</span>
+        <div class="item" v-for="(post) in postsRev" :key="post.key" @click="load(post)">
+          {{post.val().author.full_name}} {{post.val().timestamp | ymd}}
+          <span
+            @click="remove(post)"
+          >×</span>
         </div>
-
-
       </div>
       <div class="editor__right">
         <div class="menu__inline">
@@ -49,24 +39,21 @@
             <option value="32">32</option>
             <option value="64">64</option>
             <option value="128">128</option>
-          </select>          
+          </select>
         </div>
         <canvas class="canvas" width="1024" height="600"></canvas>
       </div>
-
     </div>
-
   </div>
 </template>
 
 <script lang="ts">
-
 import { PianoRoll } from "./pianoroll";
 var piano: PianoRoll;
 import * as mml from "../model/mml";
 import * as mml2smf from "mml2smf";
 import * as download from "../model/download";
-import * as firebase from "firebase"
+import * as firebase from "firebase";
 
 let playing = false;
 
@@ -85,8 +72,8 @@ document.addEventListener("keypress", e => {
     togglePlaying();
   }
 });
-var auth: any
-var ref: any
+var auth: any;
+var ref: any;
 
 export default {
   data() {
@@ -100,14 +87,16 @@ export default {
     };
   },
   computed: {
-    postsRev(){
-      return this.posts.reverse()
+    postsRev() {
+      return this.posts.reverse();
     }
   },
-  filters:{
-    ymd(input){
-      var d = new Date(input)
-      return `${d.getMonth()+1}/${d.getDate()} ${("00" + d.getHours()).slice(-2)}:${("00"+ d.getMinutes()).slice(-2)}`
+  filters: {
+    ymd(input) {
+      var d = new Date(input);
+      return `${d.getMonth() + 1}/${d.getDate()} ${("00" + d.getHours()).slice(
+        -2
+      )}:${("00" + d.getMinutes()).slice(-2)}`;
     }
   },
   mounted() {
@@ -121,8 +110,8 @@ export default {
     };
     firebase.initializeApp(config);
 
-    var el: HTMLCanvasElement = <HTMLCanvasElement>document.querySelector(
-      ".canvas"
+    var el: HTMLCanvasElement = <HTMLCanvasElement>(
+      document.querySelector(".canvas")
     );
     piano = new PianoRoll({
       el: el,
@@ -132,20 +121,20 @@ export default {
     piano.draw();
 
     this.auth = firebase.auth();
-    this.ref = firebase.database().ref('posts');
-    this.auth.onAuthStateChanged((user: FirebaseUser)=>{
+    this.ref = firebase.database().ref("posts");
+    this.auth.onAuthStateChanged((user: FirebaseUser) => {
       this.user = user;
     });
     this.ref.off();
-    this.ref.limitToLast(30).on('child_added', (item: FirebaseItem)=>{
-      this.posts.push(item)
-    });    
+    this.ref.limitToLast(30).on("child_added", (item: FirebaseItem) => {
+      this.posts.push(item);
+    });
   },
   watch: {
     patternLength(value: string) {
-      console.log(value)
+      console.log(value);
       piano.patternLength = parseInt(value);
-      console.log("piano.patternLength", piano.patternLength)
+      console.log("piano.patternLength", piano.patternLength);
     }
   },
   methods: {
@@ -181,15 +170,15 @@ export default {
       this.isMenuVisible = true;
       this.isExportDialogVisible = false;
     },
-    login(){
+    login() {
       this.auth.signInWithPopup(new firebase.auth.TwitterAuthProvider());
     },
-    logout(){
+    logout() {
       this.auth.signOut();
     },
-    save(){
+    save() {
       var currentUser = this.auth.currentUser;
-      var item:FirebaseItemBody = {
+      var item: FirebaseItemBody = {
         author: {
           uid: this.auth.currentUser.uid,
           full_name: this.auth.currentUser.displayName
@@ -198,55 +187,55 @@ export default {
         patternLength: this.patternLength,
         timestamp: firebase.database.ServerValue.TIMESTAMP
       };
-      this.ref.push(item).then(()=>{
-        console.log("Done")
-      })
+      this.ref.push(item).then(() => {
+        console.log("Done");
+      });
     },
-    remove(post: FirebaseItem){
+    remove(post: FirebaseItem) {
       this.ref.child(post.key).remove();
       window.location.reload();
-
     },
-    load(post: FirebaseItem){
-      var p = post.val()
-      this.notes = JSON.parse(p.data)
-      this.patternLength = p.patternLength
-      piano.notes = this.notes
-      piano.patternLength = this.patternLength
+    load(post: FirebaseItem) {
+      var p = post.val();
+      this.notes = JSON.parse(p.data);
+      this.patternLength = p.patternLength;
+      piano.notes = this.notes;
+      piano.patternLength = this.patternLength;
       piano.draw();
     }
   }
 };
 
-export class FirebaseItemBody{
+export class FirebaseItemBody {
   author: {
-    uid: string,
-    full_name: string
-  }
-  timestamp: Object
-  data: string
-  patternLength: number
+    uid: string;
+    full_name: string;
+  };
+  timestamp: Object;
+  data: string;
+  patternLength: number;
 }
-interface FirebaseItemValue { (): FirebaseItemBody }
-export class FirebaseItem{
-  key: string
-  val: FirebaseItemValue
+interface FirebaseItemValue {
+  (): FirebaseItemBody;
 }
-
-interface OnAuthStateChangedCallback {(user: FirebaseUser): void}
-export class FirebaseUser{
-  photoURL: string
-  displayName: string
+export class FirebaseItem {
+  key: string;
+  val: FirebaseItemValue;
 }
 
-
+interface OnAuthStateChangedCallback {
+  (user: FirebaseUser): void;
+}
+export class FirebaseUser {
+  photoURL: string;
+  displayName: string;
+}
 </script>
 
 <style>
 #app {
   position: relative;
 }
-
 
 .fade {
   position: fixed;
@@ -317,12 +306,11 @@ nav.menu {
   display: flex;
 }
 
-.editor__left{
-  width: 15rem; 
+.editor__left {
+  width: 15rem;
   min-width: 15rem;
 }
-.editor__right{
-  
+.editor__right {
 }
 
 .export-dialog {
@@ -339,25 +327,25 @@ textarea {
   height: 300px;
 }
 
-.experimental{
+.experimental {
   margin: 2rem;
   background: #666;
 }
 
 .editor__save {
-    /* line-height: 2rem; */
-    border: 1px solid white;
-    margin: 0.4rem;
-    padding: 0.5rem;
-    border-radius: 0.2rem;
-    text-align: center;
-    cursor: pointer;
+  /* line-height: 2rem; */
+  border: 1px solid white;
+  margin: 0.4rem;
+  padding: 0.5rem;
+  border-radius: 0.2rem;
+  text-align: center;
+  cursor: pointer;
 }
 .editor__save:hover {
   background: #666;
 }
 
-.item{
+.item {
   cursor: pointer;
   padding: 0 0.5rem;
 }
@@ -366,7 +354,7 @@ textarea {
   background: #666;
 }
 
-.menu__inactive{
+.menu__inactive {
   padding: 0 1rem;
 }
 </style>

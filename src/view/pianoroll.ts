@@ -1,19 +1,19 @@
-import { DrawingDriver } from "./canvas"
-import { Note } from "../model/note"
-import * as audio from "../model/audio"
+import { DrawingDriver } from "./canvas";
+import { Note } from "../model/note";
+import * as audio from "../model/audio";
 
 interface NoteEvent {
   noteNumber: number;
 }
 
 function playNote(e: NoteEvent, length: number) {
-  audio.playNote(e.noteNumber, length)
+  audio.playNote(e.noteNumber, length);
 }
 
 interface PianoRollOptions {
-  el: HTMLCanvasElement,
-  notes: Note[],
-  patternLength: number
+  el: HTMLCanvasElement;
+  notes: Note[];
+  patternLength: number;
 }
 
 export class PianoRoll {
@@ -31,27 +31,34 @@ export class PianoRoll {
   tick() {
     if (this.playing) {
       this.playingPos++;
-      this.drv.playPosition = this.playingPos
+      this.drv.playPosition = this.playingPos;
       if (this.playingPos >= this.drv.patternLength) {
         this.playingPos = 0;
       }
-      this.notes.forEach((note) => {
+      this.notes.forEach(note => {
         if (note.start === this.playingPos) {
-          playNote({
-            noteNumber: note.no + 48
-          }, note.length * 60000 / this.bpm / 4)
+          playNote(
+            {
+              noteNumber: note.no + 48
+            },
+            (note.length * 60000) / this.bpm / 4
+          );
         }
-      })
-      this.draw()
+      });
+      this.draw();
     }
   }
 
-  set notes(notes){
+  set notes(notes) {
     this._notes = notes;
-    this.drv = new DrawingDriver(this.el.getContext("2d"), this.el.offsetWidth, this.el.offsetHeight);
-    this.draw()
+    this.drv = new DrawingDriver(
+      this.el.getContext("2d"),
+      this.el.offsetWidth,
+      this.el.offsetHeight
+    );
+    this.draw();
   }
-  get notes(){
+  get notes() {
     return this._notes;
   }
 
@@ -69,58 +76,61 @@ export class PianoRoll {
 
     setInterval(() => {
       this.tick();
-    }, timebase)
+    }, timebase);
 
     this.el.addEventListener("mousemove", (e: MouseEvent) => {
-      this.onMouseMove(e.offsetX, e.offsetY)
+      this.onMouseMove(e.offsetX, e.offsetY);
     });
 
-    this.el.addEventListener("mousedown", (e) => {
+    this.el.addEventListener("mousedown", e => {
       e.preventDefault();
-      this.onMouseDown(e.offsetX, e.offsetY)
-    })
+      this.onMouseDown(e.offsetX, e.offsetY);
+    });
 
     this.el.addEventListener("mouseup", (e: MouseEvent) => {
       e.preventDefault();
-      this.onMouseUp(e.offsetX, e.offsetY)
+      this.onMouseUp(e.offsetX, e.offsetY);
     });
 
-    this.el.addEventListener("touchmove", (e) => {
-      let pos = convertTouchEvent(e)
-      this.onMouseMove(pos.x, pos.y)
-    })
-    this.el.addEventListener("touchstart", (e) => {
+    this.el.addEventListener("touchmove", e => {
+      let pos = convertTouchEvent(e);
+      this.onMouseMove(pos.x, pos.y);
+    });
+    this.el.addEventListener("touchstart", e => {
       e.preventDefault();
-      let pos = convertTouchEvent(e)
-      this.onMouseDown(pos.x, pos.y)
-    })
-    this.el.addEventListener("touchend", (e) => {
+      let pos = convertTouchEvent(e);
+      this.onMouseDown(pos.x, pos.y);
+    });
+    this.el.addEventListener("touchend", e => {
       e.preventDefault();
-      let pos = convertTouchEvent(e)
-      this.onMouseUp(pos.x, pos.y)
-    })
+      let pos = convertTouchEvent(e);
+      this.onMouseUp(pos.x, pos.y);
+    });
   }
 
   set patternLength(value: number) {
     if (this.drv) {
-      this.drv.patternLength = value
-      this.el.width = value * 32
+      this.drv.patternLength = value;
+      this.el.width = value * 32;
       this.playingPos = 0;
-      this.draw()
+      this.draw();
     }
   }
 
   onMouseDown(x: number, y: number) {
     var note = this.drv.createNote(1, x, y, 1);
-    this.nowNote = note.no
-    this.startPos = note.start
+    this.nowNote = note.no;
+    this.startPos = note.start;
 
     // 0 = C3
-    playNote({
-      noteNumber: note.no + 48
-    }, 100);
+    playNote(
+      {
+        noteNumber: note.no + 48
+      },
+      100
+    );
     this.draw();
-    this.clicked = true
+    this.clicked = true;
   }
 
   onMouseMove(x: number, y: number) {
@@ -128,17 +138,20 @@ export class PianoRoll {
     if (this.clicked) {
       note = this.drv.createNoteWithLength(1, this.startPos, y, x);
       if (this.nowNote !== note.no) {
-        playNote({
-          noteNumber: note.no + 48
-        }, 100);
-        this.nowNote = note.no
+        playNote(
+          {
+            noteNumber: note.no + 48
+          },
+          100
+        );
+        this.nowNote = note.no;
       }
     }
     /*
     let ret = this.drv.toScreen(note)
     console.log(ret)
     */
-    this.hoverNote = note
+    this.hoverNote = note;
     this.draw();
   }
 
@@ -151,14 +164,13 @@ export class PianoRoll {
       this.notes.push(note);
     }
     this.draw();
-    this.clicked = false
+    this.clicked = false;
   }
-
 
   _drawAllNotes() {
     this.notes.forEach((note: Note) => {
-      this.drv.drawNote(note, "#FFF")
-    })
+      this.drv.drawNote(note, "#FFF");
+    });
   }
 
   _drawHoverNote() {
@@ -167,9 +179,9 @@ export class PianoRoll {
 
   draw() {
     this.drv.clear();
-    this._drawAllNotes()
+    this._drawAllNotes();
     if (this.hoverNote) {
-      this._drawHoverNote()
+      this._drawHoverNote();
     }
   }
 
@@ -185,10 +197,10 @@ export class PianoRoll {
   }
 
   play() {
-    this.playing = true
+    this.playing = true;
   }
   stop() {
-    this.playing = false
+    this.playing = false;
   }
 }
 
@@ -197,17 +209,16 @@ function _isHit(n: Note, note: Note) {
     n.no === note.no &&
     n.start <= note.start &&
     n.start + n.length - 1 >= note.start
-  )
+  );
 }
 
 function convertTouchEvent(e: TouchEvent) {
-  var dom = <HTMLElement>e.target
+  var dom = <HTMLElement>e.target;
   var rect = dom.getBoundingClientRect();
   var x = e.targetTouches[0].pageX - rect.left;
   var y = e.targetTouches[0].pageY - rect.top;
   return {
     x: x,
     y: y
-  }
+  };
 }
-
