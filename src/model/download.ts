@@ -1,4 +1,8 @@
-export function downloadBlob(data : Uint8Array, fileName: string, mimeType :string) {
+export function downloadBlob(
+  data: Uint8Array,
+  fileName: string,
+  mimeType: string
+) {
   let blob = new Blob([data], {
     type: mimeType
   });
@@ -7,16 +11,14 @@ export function downloadBlob(data : Uint8Array, fileName: string, mimeType :stri
   setTimeout(function() {
     return window.URL.revokeObjectURL(url);
   }, 1000);
-};
+}
 
-export function downloadURL(data:string, fileName:string) {
-  var a;
-  a = document.createElement('a');
-  a.href = data;
-  a.download = fileName;
-  document.body.appendChild(a);
-  a.style.display = 'none';
-  a.click();
-  a.remove();
-};
-
+export function downloadURL(data: string, fileName: string) {
+  const link = document.createElement("a");
+  link.href = data;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.style.display = "none";
+  link.click();
+  link.remove();
+}

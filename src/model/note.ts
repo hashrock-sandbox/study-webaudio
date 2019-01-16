@@ -1,8 +1,8 @@
 export interface NoteOptions {
-  ch: number,
-  start: number,
-  note: number,
-  end: number
+  ch: number;
+  start: number;
+  note: number;
+  end: number;
 }
 
 export class Note {
